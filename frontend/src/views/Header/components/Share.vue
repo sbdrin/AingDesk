@@ -1,6 +1,6 @@
 <template>
     <NModal v-model:show="shareShow" :close-on-esc="false" :closable="false" :mask-closable="false">
-        <NCard :title="$t('将AingDesk分享给好友一起使用')" style="width: 880px;">
+        <NCard :title="$t('分享给好友一起使用')" style="width: 880px;">
             <template #header-extra>
                 <i class="i-common:close w-24 h-24 cursor-pointer" @click="closeShare"></i>
             </template>
@@ -17,21 +17,23 @@
                                 max-tag-count="responsive" style="width: 150px;" :placeholder="$t('请选择知识库')" />
                         </NFormItem>
                         <NFormItem>
-                            <NSelect :options="myAgentList" label-field="agent_title" value-field="agent_name" v-model:value="shareAgent" style="width: 120px;" :placeholder="$t('智能体')" />
+                            <NSelect :options="myAgentList" label-field="agent_title" value-field="agent_name"
+                                v-model:value="shareAgent" style="width: 120px;" :placeholder="$t('智能体')" />
                         </NFormItem>
-												<NFormItem>
-														<NSelect :options="visibleModelList" v-model:value="shareModel" style="width: 290px;"
-																:render-option="renderOption" />
-												</NFormItem>
                         <NFormItem>
-                            <NButton type="success" @click="createShare(title, shareModelDto, knowledges,shareAgent)">{{ $t("分享")
+                            <NSelect :options="visibleModelList" v-model:value="shareModel" style="width: 290px;"
+                                :render-option="renderOption" />
+                        </NFormItem>
+                        <NFormItem>
+                            <NButton type="success" @click="createShare(title, shareModelDto, knowledges, shareAgent)">{{
+                                $t("分享")
                             }}
                             </NButton>
                         </NFormItem>
                     </NForm>
                 </div>
                 <span style="position: absolute;margin-top: -25px;">{{
-                    $t("提示：如果分享列表为空，分享连接服务将自动停止，此时外网无法通过AingDesk访问到任何模型")
+                    $t("提示：如果分享列表为空，分享连接服务将自动停止，此时外网无法访问到任何模型")
                     }}</span>
             </div>
             <NDataTable :columns="labelColumns" :data="shareHistory" />
@@ -52,12 +54,12 @@
                         </NFormItem>
                         <NFormItem>
                             <NSelect :options="knowledgeList" label-field="ragName" value-field="ragName"
-                                v-model:value="modify_knowledges" multiple
-                                :ellipsis-tag-popover-props="{ trigger: 'hover' }" max-tag-count="responsive"
-                                style="width: 150px;" :placeholder="$t('请选择知识库')" />
+                                v-model:value="modify_knowledges" multiple :ellipsis-tag-popover-props="{ trigger: 'hover' }"
+                                max-tag-count="responsive" style="width: 150px;" :placeholder="$t('请选择知识库')" />
                         </NFormItem>
-												<NFormItem>
-                            <NSelect :options="myAgentList" label-field="agent_title" value-field="agent_name" v-model:value="modify_shareAgent" style="width: 120px;" :placeholder="$t('智能体')" />
+                        <NFormItem>
+                            <NSelect :options="myAgentList" label-field="agent_title" value-field="agent_name"
+                                v-model:value="modify_shareAgent" style="width: 120px;" :placeholder="$t('智能体')" />
                         </NFormItem>
                         <NFormItem>
                             <NSelect :options="visibleModelList" v-model:value="modify_shareModel" style="width: 290px;"
@@ -69,7 +71,8 @@
             <div class="flex justify-end items-center gap-5">
                 <NButton type="default" @click="closeModifyShare">{{ $t("取消") }}</NButton>
                 <NButton type="success"
-                    @click="modifyShare(modify_share_id, modify_shareModel_dto, modify_title, modify_knowledges,modify_shareAgent)">{{
+                    @click="modifyShare(modify_share_id, modify_shareModel_dto, modify_title, modify_knowledges, modify_shareAgent)">
+                    {{
                         $t("确认")
                     }}
                 </NButton>
@@ -102,7 +105,7 @@ import { useI18n } from "vue-i18n";
 import { useClipboard } from "@vueuse/core";
 import { message } from "@/utils/naive-tools";
 import { computed, ref, watch } from "vue";
-import { createShare, getShareList, modifyShare, delShare,closeShare,openModifyShare,closeModifyShare } from "@/views/Header/controller";
+import { createShare, getShareList, modifyShare, delShare, closeShare, openModifyShare, closeModifyShare } from "@/views/Header/controller";
 
 import { getHeaderStoreData } from "../store";
 import { getKnowledgeStoreData } from "@/views/KnowleadgeStore/store";
@@ -114,15 +117,15 @@ const {
     modifyShareShow,
     currentModel,
     delShareConfirmShow,
-		shareModel,
-		shareAgent,
+    shareModel,
+    shareAgent,
     title,
     knowledges,
     modify_title,
     modify_shareModel,
     modify_share_id,
-		modify_knowledges,
-		modify_shareAgent,
+    modify_knowledges,
+    modify_shareAgent,
     del_share_id
 } = getHeaderStoreData()
 const {
@@ -143,13 +146,13 @@ const modify_shareModel_dto = computed(() => {
 
 // 计算我的智能体列表，增加一个“不使用”选项
 const myAgentList = computed(() => [
-	{ agent_name: '', agent_title: $t('不使用') },
-	...agentList.value.filter(item => !item.is_system)
+    { agent_name: '', agent_title: $t('不使用') },
+    ...agentList.value.filter(item => !item.is_system)
 ])
 
 const { t: $t } = useI18n()
 const { copy } = useClipboard({ source: "" })
-async function copyQuestion(text: string) {
+async function copyQuestion (text: string) {
     await copy(text)
     message.success($t("复制成功"))
 }
@@ -169,16 +172,16 @@ const labelColumns = ref<DataTableColumns>([
     {
         title: $t("模型"),
         key: "model",
-        render(row) {
+        render (row) {
             return <span>{row.model}:{row.parameters}</span>
         }
-		},
-		{
-				title: $t("知识库"),
-				key: "rag_list",
-				render(row: any) {
-						const ragList = row.rag_list.join(",")
-						return <div class="reg-wrapper">
+    },
+    {
+        title: $t("知识库"),
+        key: "rag_list",
+        render (row: any) {
+            const ragList = row.rag_list.join(",")
+            return <div class="reg-wrapper">
                 <NTooltip>
                     {{
                         default: () => ragList,
@@ -186,23 +189,23 @@ const labelColumns = ref<DataTableColumns>([
                     }}
                 </NTooltip>
             </div>
-				}
-		},
-		{
+        }
+    },
+    {
         title: $t("智能体"),
-				key: "agent_name",
-				render(row) {
-					if (row.agent_name) {
-						const agent = myAgentList.value.find((item) => item.agent_name === row.agent_name)
-						return <span>{agent?.agent_title}</span>
-					}	
-					return <span>-</span>
-				}
+        key: "agent_name",
+        render (row) {
+            if (row.agent_name) {
+                const agent = myAgentList.value.find((item) => item.agent_name === row.agent_name)
+                return <span>{agent?.agent_title}</span>
+            }
+            return <span>-</span>
+        }
     },
     {
         title: $t("访问地址"),
         key: "url",
-        render(row) {
+        render (row) {
             return <div class="url-wrapper">
                 <NTooltip>
                     {{
@@ -223,7 +226,7 @@ const labelColumns = ref<DataTableColumns>([
     {
         title: $t("操作"),
         key: "operation",
-        render(row) {
+        render (row) {
             return <div class="operation-btns">
                 <NButton type="success" text onClick={() => openModifyShare(row)}>{$t("修改")}</NButton>
                 <NButton type="error" text onClick={() => {
@@ -238,7 +241,7 @@ const labelColumns = ref<DataTableColumns>([
 /**
  * @description 为下拉选项添加tooltip
  */
-function renderOption({ node, option }: any) {
+function renderOption ({ node, option }: any) {
     return <n-tooltip>
         {{
             default: () => option.label,
@@ -260,6 +263,7 @@ watch(shareShow, (val) => {
 
 <style scoped lang="scss">
 @use '@/assets/base';
+
 .modal-footer {
     width: 100%;
     display: flex;
@@ -297,6 +301,7 @@ watch(shareShow, (val) => {
         @include base.single-line-ellipsis
     }
 }
+
 :deep(.reg-wrapper) {
     display: flex;
     justify-content: flex-start;
@@ -307,5 +312,4 @@ watch(shareShow, (val) => {
         @include base.single-line-ellipsis
     }
 }
-
 </style>

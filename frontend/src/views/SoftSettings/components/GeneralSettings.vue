@@ -35,8 +35,8 @@
             <n-list-item>
                 <div class="language-setting w-100% flex-between">
                     <span>{{ $t("语言选择") }} </span>
-                    <n-select :options="languageOptions" v-model:value="currentLanguage"
-                        :on-update:value="changeLanguage" style="width:120px"></n-select>
+                    <n-select :options="languageOptions" v-model:value="currentLanguage" :on-update:value="changeLanguage"
+                        style="width:120px"></n-select>
                 </div>
             </n-list-item>
             <n-list-item>
@@ -73,7 +73,7 @@
             </n-list-item>
             <n-list-item>
                 <div class="flex justify-center flex-col items-center gap-2.5">
-                    <span>{{ $t("加入AingDesk交流群") }}</span>
+                    <span>{{ $t("加入交流群") }}</span>
                     <n-image :src="wechat" width="100px" />
                 </div>
             </n-list-item>

@@ -5,20 +5,17 @@
             <div class="welcome-content">
                 <div class="logo-wrapper">
                     <NImage :src="logo" class="logo" width="100px" />
-                    <span class="brand">AingDesk</span>
+                    <!-- <span class="brand">AingDesk</span> -->
                     <span class="slogan">{{ $t("简单好用的AI助手") }}</span>
                 </div>
                 <div class="desc-wrapper">
-                    <div class="desc-item"><i
-                            class="i-si:check-circle-duotone w-20 h-20 text-[var(--bt-theme-color)]"></i>{{
-                                $t("免费开源无限制") }}</div>
-                    <div class="desc-item"><i
-                            class="i-si:check-circle-duotone w-20 h-20 text-[var(--bt-theme-color)]"></i>{{
-                                $t("可在线分享他人使用") }}
+                    <div class="desc-item"><i class="i-si:check-circle-duotone w-20 h-20 text-[var(--bt-theme-color)]"></i>{{
+                        $t("免费开源无限制") }}</div>
+                    <div class="desc-item"><i class="i-si:check-circle-duotone w-20 h-20 text-[var(--bt-theme-color)]"></i>{{
+                        $t("可在线分享他人使用") }}
                     </div>
-                    <div class="desc-item"><i
-                            class="i-si:check-circle-duotone w-20 h-20 text-[var(--bt-theme-color)]"></i>{{
-                                $t("支持联网搜索和知识库") }}
+                    <div class="desc-item"><i class="i-si:check-circle-duotone w-20 h-20 text-[var(--bt-theme-color)]"></i>{{
+                        $t("支持联网搜索和知识库") }}
                     </div>
                 </div>
                 <div class="btns">
@@ -31,22 +28,22 @@
 </template>
 
 <script setup lang="ts">
-import { NCard,NModal,NButton,NImage } from 'naive-ui';
+import { NCard, NModal, NButton, NImage } from 'naive-ui';
 import logo from "@/assets/images/logo.png";
 import useIndexStore, { getIndexStore } from "../store";
 import { storeToRefs } from "pinia";
 import storage from '@/utils/storage';
-import {openModelManage} from "@/views/Settings/controller"
+import { openModelManage } from "@/views/Settings/controller"
 import { getThirdPartyApiStoreData } from '@/views/ThirdPartyApi/store';
 import { getSettingsStoreData } from '@/views/Settings/store';
-const { thirdPartyApiShow ,} = getThirdPartyApiStoreData()
-const {welcomeShow,} = getIndexStore()
-const {settingsShow} = getSettingsStoreData()
+const { thirdPartyApiShow, } = getThirdPartyApiStoreData()
+const { welcomeShow, } = getIndexStore()
+const { settingsShow } = getSettingsStoreData()
 
 /**
  * @description 使用第三方模型
  */
-function useThirdPartyApi(){
+function useThirdPartyApi () {
     welcomeShow.value = false;
     storage.welcomeEnd = welcomeShow.value as unknown as string;
     thirdPartyApiShow.value = true;
@@ -55,7 +52,7 @@ function useThirdPartyApi(){
 /**
  * @description 使用本地模型
  */
-function useOllama(){
+function useOllama () {
     welcomeShow.value = false;
     storage.welcomeEnd = welcomeShow.value as unknown as string;
     openModelManage();

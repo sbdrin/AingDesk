@@ -2,10 +2,10 @@
     <div class="layout-sider-wrapper">
         <!-- logo部分 -->
         <div class="logo">
-            <div class=logo-left>
+            <!-- <div class=logo-left>
                 <n-image :src="logo" object-fit="cover" class="h-30" preview-disabled />
                 <span class="text-[var(--bt-tit-color-secondary)]">AingDesk</span>
-            </div>
+            </div> -->
             <div>
                 <i class="i-common:fold w-18 h-18  cursor-pointer" @click="doFold"></i>
             </div>
@@ -41,7 +41,7 @@
 
         <div class="recent-header">
             <span class=" text-[var(--bt-notice-text-color)] flex justify-start items-center ml-10">{{ $t("知识库")
-                }}</span>
+            }}</span>
         </div>
 
         <!-- 知识库 -->
@@ -81,7 +81,7 @@ import KnowledgeList from "./components/KnowledgeList.vue";
 import SiderBottom from "./components/SiderBottom.vue";
 import RemoveChatConfirm from "./components/RemoveChatConfirm.vue";
 import ModifyChatConfirm from "./components/ModifyChatConfirm.vue";
-import { get_chat_list, makeNewChat, doFold,cleanAllChats } from "@/views/Sider/controller"
+import { get_chat_list, makeNewChat, doFold, cleanAllChats } from "@/views/Sider/controller"
 import { getSoftSettingsStoreData } from "../SoftSettings/store";
 import Agent from "@/views/Agent/index.vue";
 import logoImage from "@/assets/images/logo.png"
