@@ -1,6 +1,5 @@
 import { nextTick, ref } from "vue"
-import { post } from "@/api"
-import axios from "axios"
+import axios, { post } from "@/api"
 import { eventBUS } from "@/views/Home/utils/tools"
 import { sendLog } from "@/views/Home/controller"
 import { create_chat, getChatInfo } from "@/views/Sider/controller"
@@ -29,7 +28,7 @@ type ChatParams = {
     images?: string
     regenerate_id?: string
 }
-export async function sendChat(params: ChatParams) {
+export async function sendChat (params: ChatParams) {
     const { currentModel, } = getHeaderStoreData()
     const { currentContextId, } = getSiderStoreData()
     const { targetNet, } = getSoftSettingsStoreData()
@@ -53,14 +52,13 @@ export async function sendChat(params: ChatParams) {
         }
         currentTalkingChatId.value = currentContextId.value
         // 找到当前对话的记录
-        let currentChat: null | MultipeQuestionDto = null;
-        for (let [key] of chatHistory.value) {
+        let currentChat: null | MultipeQuestionDto = null; for (let [key] of chatHistory.value) {
             if (key.content == params.user_content) {
                 currentChat = key
             }
         }
 
-        await axios.post("http://127.0.0.1:7071/chat/chat", {
+        await axios.post("/chat/chat", {
             model,
             parameters,
             context_id: currentContextId.value,
@@ -101,7 +99,7 @@ export async function sendChat(params: ChatParams) {
 /**
  * @description 终止对话生成
  */
-export async function stopGenerate() {
+export async function stopGenerate () {
     const { currentContextId } = getSiderStoreData()
     const { isInChat } = getChatContentStoreData()
     try {
@@ -153,7 +151,7 @@ export const acceptFileType = [...fileLimit, ...imageLimit].reduce((p, v) => {
 /**
  * @description 选择文件
  */
-export function chooseQuestionFiles() {
+export function chooseQuestionFiles () {
     const { questionFilesRef } = getChatToolsStoreData()
     questionFilesRef.value.click()
 }
@@ -161,7 +159,7 @@ export function chooseQuestionFiles() {
 /**
  * @description 上传附件：文件选择回调
  */
-export function filesChange() {
+export function filesChange () {
     const { questionFilesRef, questionFileList, questionImageList, questionImages, questionFiles, questionFilesCache } = getChatToolsStoreData()
     const sizeCheck = checkFileSize(questionFilesRef.value.files[0])
     if (!sizeCheck) return
@@ -181,7 +179,7 @@ export function filesChange() {
 /**
  * @description 删除上传的文件
  */
-export function removeFile(index: number) {
+export function removeFile (index: number) {
     const { questionFileList, questionFiles, questionFilesCache } = getChatToolsStoreData()
     const fileName = questionFileList.value.splice(index, 1)
     questionFiles.value.splice(index, 1)
@@ -192,7 +190,7 @@ export function removeFile(index: number) {
 /**
  * @description 删除上传的图片
  */
-export function removeImage(index: number) {
+export function removeImage (index: number) {
     const { questionImages, questionImageList, questionFilesCache } = getChatToolsStoreData()
     const fileName = questionImageList.value.splice(index, 1)
     questionImages.value.splice(index, 1)
@@ -206,7 +204,7 @@ export function removeImage(index: number) {
 * 文件缓存
 * 清除缓存中的指定文件
  */
-export function removeFileFromeCache(fileName: string) {
+export function removeFileFromeCache (fileName: string) {
     const { questionFilesCache } = getChatToolsStoreData()
     questionFilesCache.value = questionFilesCache.value.filter(item => item.name !== fileName)
 }
@@ -215,7 +213,7 @@ export function removeFileFromeCache(fileName: string) {
  * 
  * 计算文件缓存中所有文件大小总和与20mb的比较
  */
-export function checkFileSize(file: File) {
+export function checkFileSize (file: File) {
     const { questionFilesCache } = getChatToolsStoreData()
     const totalSize = questionFilesCache.value.reduce((p, v) => {
         return p + v.size
@@ -230,7 +228,7 @@ export function checkFileSize(file: File) {
 /**
  * @description 滚动条
  */
-export function scrollMove() {
+export function scrollMove () {
     const { scrollRef, userScrollSelf } = getChatContentStoreData()
     let timer: any = null
     return (delay: number) => {
@@ -259,7 +257,7 @@ export function scrollMove() {
 /**
  * @description 发送对话内容到模型
  */
-export function sendChatToModel() {
+export function sendChatToModel () {
     const { isInChat, userScrollSelf, chatHistory } = getChatContentStoreData()
     const { questionContent, questionFiles, questionImages, questionFileList, questionImageList, questionFilesCache } = getChatToolsStoreData()
     const { currentModel, } = getHeaderStoreData()
@@ -297,7 +295,7 @@ export function sendChatToModel() {
 /**
  * @description 键盘发送
  */
-export function sendChartToModelForKeyBoard(event: KeyboardEvent) {
+export function sendChartToModelForKeyBoard (event: KeyboardEvent) {
     const { isInChat } = getChatContentStoreData()
     if (isInChat.value) return
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -311,7 +309,7 @@ export function sendChartToModelForKeyBoard(event: KeyboardEvent) {
 /**
  * @description 是否启用联网搜索
  */
-export function useSearchEngine() {
+export function useSearchEngine () {
     const { netActive, } = getChatToolsStoreData()
     netActive.value = !netActive.value
 }
@@ -320,7 +318,7 @@ export function useSearchEngine() {
 /**
  * @description 打开临时对话
  */
-export function useTempChat() {
+export function useTempChat () {
     const { temp_chat, } = getChatToolsStoreData()
     temp_chat.value = !temp_chat.value
 }
@@ -329,7 +327,7 @@ export function useTempChat() {
 /**
  * @description 获取已安装的MCP列表
  */
-export async function getMcpServerListForChat() {
+export async function getMcpServerListForChat () {
     const { mcpListForChat } = getChatToolsStoreData()
     try {
         const res = await post('/mcp/get_mcp_server_list');
@@ -342,7 +340,7 @@ export async function getMcpServerListForChat() {
 /**
  * @description 在对话工具时，选择mcp进行对话
  */
-export function chooseMcpServerForChat(mcpName: string) {
+export function chooseMcpServerForChat (mcpName: string) {
     const { mcpListChoosed } = getChatToolsStoreData()
     if (mcpListChoosed.value.includes(mcpName)) {
         mcpListChoosed.value = mcpListChoosed.value.filter(item => item !== mcpName)

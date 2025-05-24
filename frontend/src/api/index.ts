@@ -41,17 +41,17 @@ instance.interceptors.response.use(
 )
 
 // POST请求封装
-export async function post<T>(
+export async function post<T> (
   url: string,
   params?: T
 ): Promise<{ message: any; status: number; code: number; msg?: string; error_msg?: string }> {
   return instance.post(url, params)
 }
 
-export async function get<T>(
+export async function get<T> (
   url: string,
   params?: T
 ): Promise<{ message: any; status: boolean; code: number; msg?: string }> {
   return instance.get(url, { params })
 }
-
+export default instance
