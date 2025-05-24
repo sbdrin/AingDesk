@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2024",
+    "target": "ES2023",
     "module": "commonjs",
     "useDefineForClassFields": true,
     "skipLibCheck": true,
@@ -21,12 +21,8 @@
     "noFallthroughCasesInSwitch": false,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "./",
-    "outDir": "./public/electron/",
+    "outDir": "./public/electron/"
   },
-  "include": [
-    "./electron/**/*"
-  ],
-  "exclude": [
-    "node_modules/**/*",
-  ]
+  "include": ["./electron/**/*"],
+  "exclude": ["node_modules/**/*"]
 }
