@@ -15,7 +15,7 @@ import { useI18n } from 'vue-i18n';
 const {t:$t} = useI18n()
 const props = defineProps<{ codeContent: string }>()
 const source = ref(props.codeContent)
-const { copy, copied, } = useClipboard({ source })
+const { copy, copied, } = useClipboard({ source,legacy: true })
 /**
  * @description 复制代码
  */

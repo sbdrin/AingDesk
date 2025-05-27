@@ -84,19 +84,19 @@ export async function addModels() {
  * @description 修改模型服务商
  */
 export async function editModels() {
-	const { addModelFormData, currentChooseApi } = getThirdPartyApiStoreData();
-	try {
-		const { status, ...filteredFormData } = addModelFormData.value;
-		const res = await post('/model/modify_model', {
-			...filteredFormData,
-			supplierName: currentChooseApi.value?.supplierName,
-			capability: JSON.stringify(addModelFormData.value.capability),
-		});
-		await getEmbeddingModels();
-		await get_model_list();
-	} catch (error) {
-		sendLog(error as Error);
-	}
+    const { addModelFormData, currentChooseApi } = getThirdPartyApiStoreData();
+    try {
+        const { status, ...filteredFormData } = addModelFormData.value;
+        const res = await post('/model/modify_model', {
+            ...filteredFormData,
+            supplierName: currentChooseApi.value?.supplierName,
+            capability: JSON.stringify(addModelFormData.value.capability),
+        });
+        await getEmbeddingModels();
+        await get_model_list();
+    } catch (error) {
+        sendLog(error as Error);
+    }
 }
 
 /**
@@ -210,62 +210,40 @@ export function jumpToHelp(url: string) {
 }
 
 /**
- * @description 修改模型标题
- */
-// export async function confirmEditModelTit() {
-//     const { currentModelNameForEdiit, modelTitTemp } = getThirdPartyApiStoreData()
-//     await setModelTitle(modelTitTemp.value)
-//     message.success($t("修改成功"))
-//     modelTitTemp.value = ""
-//     currentModelNameForEdiit.value = ""
-// }
-
-/**
- * @desdcription 修改模型标题：取消修改
- */
-// export function cancelEditModelTit() {
-//     const { currentModelNameForEdiit, modelTitTemp } = getThirdPartyApiStoreData()
-//     modelTitTemp.value = ""
-//     currentModelNameForEdiit.value = ""
-// }
-/**
  * @description 修改模型数据
  */
 export function handleModelDataChange(row: AddThirdPartySupplierMode) {
-	const { addSupplierModel, isEditModelFormData, addModelFormData } = getThirdPartyApiStoreData();
-	isEditModelFormData.value = true;
-	addSupplierModel.value = true;
-	addModelFormData.value = JSON.parse(JSON.stringify(row));
+    const { addSupplierModel, isEditModelFormData, addModelFormData } = getThirdPartyApiStoreData();
+    isEditModelFormData.value = true;
+    addSupplierModel.value = true;
+    addModelFormData.value = JSON.parse(JSON.stringify(row));
 }
 
 /**
- * @description 删除服务商
+ * @description 删除服务商弹窗
  */
 export async function delSupplier(supplierName: string) {
-    const dialog = useDialog({
-			title: $t('提示'),
-			content: () => $t('是否删除当前服务商? 该操作会同时删除下属所有模型，请谨慎操作！'),
-			style: {
-				width: '500px',
-			},
-			action: () => (
-				<div class="flex justify-center gap-2.5">
-					<NButton onClick={dialog.destroy}>
-						{$t('取消')}
-					</NButton>
-					<NButton
-						type="warning"
-						onClick={async () => {
-							await removeSupplier(supplierName);
-							message.success($t('删除成功'));
-							dialog.destroy();
-						}}
-					>
-						{$t('确认')}
-					</NButton>
-				</div>
-			),
-		});
+    const { deleteSupplierShow } = getThirdPartyApiStoreData()
+    deleteSupplierShow.value = true
+}
+
+/**
+ * @description 取消删除服务商
+ */
+export function cancelDelSupplier() {
+    const { deleteSupplierShow } = getThirdPartyApiStoreData()
+    deleteSupplierShow.value = false
+}
+
+/**
+ * @description 确认删除模型服务商
+ */
+export async function confirmDelSupplier() {
+    const { currentSupplierName, deleteSupplierShow } = getThirdPartyApiStoreData()
+    await removeSupplier(currentSupplierName.value);
+    message.success($t('删除成功'));
+    deleteSupplierShow.value = false;
+    getSupplierList()
 }
 
 /**
@@ -273,9 +251,9 @@ export async function delSupplier(supplierName: string) {
  */
 export async function confirmAddSupplier() {
     const { addSupplierFormData, addSupplierShow, addSupplierForm, isEditModelFormData } = getThirdPartyApiStoreData();
-		await addSupplierForm.value.validate()
-		await addSupplier();
-    message.success(isEditModelFormData.value?$t('保存成功'):$t('添加成功'));
+    await addSupplierForm.value.validate()
+    await addSupplier();
+    message.success(isEditModelFormData.value ? $t('保存成功') : $t('添加成功'));
     addSupplierFormData.value = {
         supplierName: "",
         apiKey: "",
@@ -373,30 +351,28 @@ export async function saveConfig() {
  * @description 删除模型
  */
 export async function delModel(modelName: string) {
-    const { currentChooseApi } = getThirdPartyApiStoreData()
-    const dialog = useDialog({
-			title: $t('提示'),
-			content: () => $t('是否确定删除当前模型？该操作不可逆'),
-			style: {
-				width: '400px',
-			},
-			action: () => (
-				<div class="flex justify-center gap-2.5">
-					<NButton onClick={dialog.destroy}>{$t('取消')}</NButton>
-					<NButton
-						type="warning"
-						onClick={async () => {
-							await removeSupplierModel(modelName);
-							message.success($t('模型删除成功'));
-							getSupplierModelList(currentChooseApi.value!.supplierName);
-							dialog.destroy();
-						}}
-					>
-						{$t('确认')}
-					</NButton>
-				</div>
-			),
-		});
+    const { deleteModelName, deleteModelShow } = getThirdPartyApiStoreData()
+    deleteModelName.value = modelName
+    deleteModelShow.value = true
+}
+
+/**
+ * @description 取消删除模型
+ */
+export function cancelDelModel() {
+    const { deleteModelShow } = getThirdPartyApiStoreData()
+    deleteModelShow.value = false
+}
+
+/***
+ * @description 确认删除模型
+ */
+export async function confirmDelModel() {
+    const { deleteModelName, currentChooseApi } = getThirdPartyApiStoreData()
+    await removeSupplierModel(deleteModelName.value);
+    message.success($t('模型删除成功'));
+    getSupplierModelList(currentChooseApi.value!.supplierName);
+    cancelDelModel()
 }
 
 /**
@@ -418,12 +394,12 @@ export async function capabilityChange(val: string[]) {
  */
 export async function confirmAddModel() {
     const { addModelForm, addSupplierModel, addModelFormData, currentChooseApi, cantChoose, isEditModelFormData } = getThirdPartyApiStoreData();
-		await addModelForm.value.validate()
-		if (isEditModelFormData.value) {
-			await editModels();
-		} else {
-			await addModels();
-		}
+    await addModelForm.value.validate()
+    if (isEditModelFormData.value) {
+        await editModels();
+    } else {
+        await addModels();
+    }
     getSupplierModelList(currentChooseApi.value!.supplierName)
     addSupplierModel.value = false
     message.success($t("模型添加成功"))
@@ -454,8 +430,8 @@ export async function closeAddModel() {
         modelName: "",
         capability: [],
         title: ""
-		}
-		isEditModelFormData.value = false
+    }
+    isEditModelFormData.value = false
 }
 
 

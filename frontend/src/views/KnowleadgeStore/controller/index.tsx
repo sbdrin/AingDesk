@@ -507,67 +507,6 @@ export async function openDocUploadDialog() {
 	knowledgeUploadDocShow.value = true;
 }
 
-// /**
-//  * @description 上传知识库文档:打开弹窗
-//  */
-// export async function openDocUploadDialogBak() {
-// 	const { fileOrDirList, chooseList, isUploadingDoc } = getKnowledgeStoreData();
-// 	async function doOk() {
-// 		try {
-// 			isUploadingDoc.value = true;
-// 			await uploadRagDocForManual();
-// 			isUploadingDoc.value = false;
-// 			fileOrDirList.value = [];
-// 			chooseList.value = [];
-// 			dialog.destroy();
-// 			ragDocLoop();
-// 		} catch (error) {
-// 			sendLog(error as Error);
-// 			isUploadingDoc.value = false;
-// 		}
-// 	}
-// 	async function doCancel() {
-// 		fileOrDirList.value = [];
-// 		chooseList.value = [];
-// 		isUploadingDoc.value = false;
-// 		dialog.destroy();
-// 	}
-// 	async function uploadAhead() {
-// 		eventBUS.$emit('chooseFile');
-// 	}
-// 	const dialog = useDialog({
-// 		title: $t('上传知识库文档'),
-// 		content: () => (
-// 			<NSpin show={isUploadingDoc.value}>
-// 				{{
-// 					default: () => <UploadKnowledgeDoc />,
-// 					description: () => <span>{$t('正在解析文档，这可能要几分钟时间...')}</span>,
-// 				}}
-// 			</NSpin>
-// 		),
-// 		style: {
-// 			width: '580px',
-// 		},
-// 		action: () => {
-// 			return (
-// 				<div class="flex justify-end items-center gap-5">
-// 					<NButton onClick={doCancel} disabled={isUploadingDoc.value ? true : false}>
-// 						{$t('取消')}
-// 					</NButton>
-// 					{fileOrDirList.value.length ? (
-// 						<NButton onClick={uploadAhead} disabled={isUploadingDoc.value ? true : false}>
-// 							{$t('继续添加文件')}
-// 						</NButton>
-// 					) : null}
-// 					<NButton type="primary" onClick={doOk} disabled={isUploadingDoc.value || fileOrDirList.value.length == 0 ? true : false}>
-// 						{$t('确认')}
-// 					</NButton>
-// 				</div>
-// 			);
-// 		},
-// 	});
-// }
-
 /**
  * @description 上传知识库文档：手动上传
  */
@@ -582,7 +521,6 @@ export async function uploadRagDocForManual() {
 	});
 	if (code == 200) {
 		message.success(msg as string);
-		// TODO:此处暂时需要做500ms的定时器，等待后端解析文件
 		setTimeout(async () => {
 			await getRagDocList(activeKnowledge.value as string);
 		}, 500);

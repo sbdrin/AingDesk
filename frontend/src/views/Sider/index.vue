@@ -71,9 +71,13 @@
 
     <!-- 优化知识库进度 -->
     <OptimizeProgress />
+
+    <!-- 清空对话 -->
+    <CleanChatsList />
 </template>
 
 <script setup lang="ts">
+import CleanChatsList from "./components/CleanChatsList.vue";
 import { getGlobalStore } from "@/stores/global"
 import OptimizeProgress from "@/views/KnowleadgeStore/components/OptimizeProgress.vue"
 import ChatList from "./components/ChatList.vue"
@@ -81,7 +85,7 @@ import KnowledgeList from "./components/KnowledgeList.vue";
 import SiderBottom from "./components/SiderBottom.vue";
 import RemoveChatConfirm from "./components/RemoveChatConfirm.vue";
 import ModifyChatConfirm from "./components/ModifyChatConfirm.vue";
-import { get_chat_list, makeNewChat, doFold,cleanAllChats } from "@/views/Sider/controller"
+import { get_chat_list, makeNewChat, doFold, cleanAllChats } from "@/views/Sider/controller"
 import { getSoftSettingsStoreData } from "../SoftSettings/store";
 import Agent from "@/views/Agent/index.vue";
 import logoImage from "@/assets/images/logo.png"
@@ -178,7 +182,7 @@ get_chat_list()
 
 .sider-divider {
     height: 1px;
-    width: calc(100% - var(--bt-pd-normal)*2);
+    width: 100%;
     background-color: rgba(0, 0, 0, .12);
     margin: var(--bt-mg-small) auto;
 }

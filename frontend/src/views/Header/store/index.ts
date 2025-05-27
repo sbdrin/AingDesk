@@ -1,4 +1,4 @@
-import type { CurrentModelDto } from "@/views/Home/dto";
+import type { CurrentModelDto, MultipleModelListDto } from "@/views/Home/dto";
 import { getThirdPartyApiStoreData } from "@/views/ThirdPartyApi/store";
 import { defineStore, storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -67,6 +67,9 @@ const useHeaderStore = defineStore("headerStore", () => {
     }
     return newList;
   })
+
+  // 多模型的对象列表
+  const multipleModelList = ref<MultipleModelListDto[]>([])
   return {
     modelList,
     currentModelDto,
@@ -91,7 +94,8 @@ const useHeaderStore = defineStore("headerStore", () => {
     modify_shareAgent,
     showModel,
     showModelList,
-    modelListShow
+    modelListShow,
+    multipleModelList
   }
 })
 

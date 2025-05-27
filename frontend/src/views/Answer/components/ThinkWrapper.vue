@@ -42,6 +42,22 @@ const md = markdownit({
     }
 })
 
+// 覆盖默认的链接渲染器，设置 target="_blank" 和 rel="noopener noreferrer"
+const defaultRender = md.renderer.rules.link_open || function(tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options);
+};
+
+md.renderer.rules.link_open = function(tokens, idx, options, env, self) {
+    // 为链接添加 target="_blank" 属性
+    tokens[idx].attrPush(['target', '_blank']);
+    
+    // 添加安全相关属性，防止新页面对原页面的访问，增强安全性
+    tokens[idx].attrPush(['rel', 'noopener noreferrer']);
+    
+    // 调用默认渲染
+    return defaultRender(tokens, idx, options, env, self);
+};
+
 // md.use(mathJax3)
 watch(() => props.content, () => {
     const res = md.render(props.content)  // 正文渲染时取消think部分

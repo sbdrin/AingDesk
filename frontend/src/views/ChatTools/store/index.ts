@@ -31,6 +31,8 @@ const useChatToolsStore = defineStore("chatTools", () => {
     const mcpListForChat = ref<McpServerListDto[]>([])
     // 对话时选择的mcp
     const mcpListChoosed = ref<string[]>([])
+    // 多模型对话的唯一id
+    const compare_id = ref<string>("")
     return {
         chatMask,
         questionContent,
@@ -43,7 +45,8 @@ const useChatToolsStore = defineStore("chatTools", () => {
         temp_chat,
         netActive,
         mcpListForChat,
-        mcpListChoosed
+        mcpListChoosed,
+        compare_id
     }
 })
 

@@ -1,45 +1,49 @@
 <template>
-	<NModal :show="agentShow" preset="dialog" :title="$t('智能体')" style="width: 740px" :show-icon="false">
+	<n-modal :show="agentShow" preset="card" :title="$t('智能体')" style="width: 740px" :show-icon="false" @close="closeAgent">
 		<template #close>
 			<i class="i-tdesign:close-circle w-20 h-20 cursor-pointer text-[#909399]" @click="agentShow = false"></i>
 		</template>
 		<div class="agent-wrapper">
-			<NButton type="primary" ghost class="mb-10" @click="createAgentShow = true">
+			<n-button type="primary" ghost class="mb-10" @click="createAgentShow = true">
 				<template #icon>
 					<i class="i-tdesign:add-circle"></i>
 				</template>
 				{{ $t('创建智能体') }}
-			</NButton>
-			<NDivider style="margin-top: 10px; margin-bottom: 10px" />
-			<NTabs>
-				<NTabPane :tab="$t('我的智能体')" name="my-agent">
-					<NScrollbar class="max-h-300px">
+			</n-button>
+			<n-divider style="margin-top: 10px; margin-bottom: 10px" />
+			<n-tabs>
+				<n-tab-pane :tab="$t('我的智能体')" name="my-agent">
+					<n-scrollbar class="max-h-300px">
 						<MyAgent />
-					</NScrollbar>
-				</NTabPane>
-			</NTabs>
-			<NDivider style="margin-top: 10px; margin-bottom: 10px" />
-			<NTabs>
-				<NTabPane :tab="$t('预设模板')" name="my-agent">
-					<NScrollbar class="max-h-300px">
+					</n-scrollbar>
+				</n-tab-pane>
+			</n-tabs>
+			<n-divider style="margin-top: 10px; margin-bottom: 10px" />
+			<n-tabs>
+				<n-tab-pane :tab="$t('预设模板')" name="my-agent">
+					<n-scrollbar class="max-h-300px">
 						<PresetAgent />
-					</NScrollbar>
-				</NTabPane>
-			</NTabs>
+					</n-scrollbar>
+				</n-tab-pane>
+			</n-tabs>
 		</div>
-	</NModal>
+	</n-modal>
+
 	<!-- 创建智能体 -->
 	<CreateAgent />
+
+	<!-- 删除智能体 -->
+	<DelAggent />
 </template>
 
 <script setup lang="ts">
-import { NModal, NButton, NTabs, NTabPane, NDivider, NScrollbar } from 'naive-ui';
+import DelAggent from './components/DelAggent.vue';
 import MyAgent from './components/MyAgent.vue';
 import PresetAgent from './components/PresetAgent.vue';
 import CreateAgent from '@/views/Agent/components/CreateAgent.vue';
 import { getAgentStoreData } from './store';
 import { useI18n } from 'vue-i18n';
-import { getAgentList } from '@/views/Agent/controller/index';
+import { getAgentList,closeAgent } from '@/views/Agent/controller';
 const { t: $t } = useI18n();
 
 const { agentShow, createAgentShow } = getAgentStoreData();

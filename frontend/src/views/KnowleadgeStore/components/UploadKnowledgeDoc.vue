@@ -1,5 +1,5 @@
 <template>
-    <n-modal :close-on-esc="false" :mask-closable="false" :title="$t('上传知识库文档')" v-model:show="knowledgeUploadDocShow" preset="card" class="w-580px">
+    <n-modal :close-on-esc="false" :mask-closable="false" :title="$t('上传知识库文档')" v-model:show="knowledgeUploadDocShow" preset="card" draggable class="w-580px" segmented>
         <n-spin :description="$t('正在解析文档，这可能要几分钟时间...')" v-model:show="isUploadingDoc">
             <div class="upload-wrapper">
                 <div class="mode-choose" v-if="chooseList.length == 0">

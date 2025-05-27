@@ -22,9 +22,20 @@ const useGlobalStore = defineStore("globalStore", () => {
         }
     })
 
+    // modal标题栏背景
+    const modalTitleBg = computed(()=>{
+        const { themeMode } = getSoftSettingsStoreData()
+        if(themeMode.value === 'light'){
+            return "#fafafa" 
+        } else {
+            return "#262626" 
+        }
+    })
+
     return {
         siderBg,
-        settingPanelBorder
+        settingPanelBorder,
+        modalTitleBg
     }
 })
 

@@ -18,11 +18,17 @@ const useThirdPartyApiStore = defineStore("thirdPartyApiStore", () => {
     const addSupplierModel = ref(false)
     // 添加模型的表单对象
     const addModelFormData = ref<AddThirdPartySupplierMode>({ modelName: '', capability: [], title: '' });
+    // 删除模型的问询弹窗
+    const deleteModelShow = ref(false)
+    // 等待删除的模型名称
+    const deleteModelName = ref("")
     // 配置模型服务商数据
     const applierServiceConfig = ref<SupplierConfigInfo>({
         baseUrl: "",
         apiKey: ""
     })
+    // 删除第三方服务商的弹窗
+    const deleteSupplierShow = ref(false)
     // 是否启用了全部模型
     const isAllModelEnable = ref(false)
     // 添加模型服务商
@@ -147,7 +153,10 @@ const useThirdPartyApiStore = defineStore("thirdPartyApiStore", () => {
         cantChoose,
         capabilityOptions,
         addModelRules,
-        isEditModelFormData
+        isEditModelFormData,
+        deleteSupplierShow,
+        deleteModelShow,
+        deleteModelName
     }
 })
 

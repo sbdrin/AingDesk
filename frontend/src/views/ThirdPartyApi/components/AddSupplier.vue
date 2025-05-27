@@ -1,6 +1,5 @@
 <template>
-    <n-modal :show="addSupplierShow">
-        <n-card :title="$t('添加模型服务商')" class="add-supplier-wrapper">
+    <n-modal v-model:show="addSupplierShow" preset="card" :title="$t('添加模型服务商')" class="add-supplier-wrapper" style="width: 580px;" draggable segmented>
             <n-form :model="addSupplierFormData" :rules="addSupplierFormRules" ref="addSupplierForm">
                 <n-form-item :label="$t('供应商名称')" path="supplierTitle">
                     <n-input v-model:value="addSupplierFormData.supplierTitle" />
@@ -21,7 +20,6 @@
                     <n-button type="primary" @click="confirmAddSupplier">{{ $t('确认') }}</n-button>
                 </div>
             </template>
-        </n-card>
     </n-modal>
 </template>
 

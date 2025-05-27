@@ -148,7 +148,7 @@ const myAgentList = computed(() => [
 ])
 
 const { t: $t } = useI18n()
-const { copy } = useClipboard({ source: "" })
+const { copy } = useClipboard({ source: "",legacy: true })
 async function copyQuestion(text: string) {
     await copy(text)
     message.success($t("复制成功"))

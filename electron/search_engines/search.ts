@@ -276,8 +276,7 @@ const generateOtherPrompt = (searchResultList: SearchResult[], query: string,doc
         (result, idx) =>
             `<result source="${result.link}" id="${idx+1}">${result.content}</result>`
     ).join("\n");
-
-
+    
     let doc_files_str = doc_files.map(
         (doc_file, idx) =>
             `<doc source="${doc_file}" id="${idx+1}">${doc_file}</doc>`
@@ -327,7 +326,6 @@ export const getDefaultPrompt = (query: string,model:string,agent_name:string): 
 // 获取网页搜索提示信息
 export const getPromptForWeb = async (query: string, model: string, chatHistory: string,doc_files:string[],agent_name:string,searchResultList?:any[],searchProvider?: string): Promise<{ userPrompt: string; systemPrompt: string;searchResultList:any,query:string }> => {
     try {
-
         if(query.length < 4) return getDefaultPrompt(query,model,agent_name);
         const searchQuery = await getSearchQuery(query, model, chatHistory);
         if(!searchResultList || !searchResultList.length){
@@ -337,12 +335,12 @@ export const getPromptForWeb = async (query: string, model: string, chatHistory:
         }
 
         if(agent_name){
-            // 如果是智能体，只保留1个搜索结果，且内容长度不超过4096个字符
-            searchResultList = searchResultList.slice(0,1);
+            // 如果是智能体，只保留3个搜索结果，且内容长度不超过4096个字符
+            searchResultList = searchResultList.slice(0,3);
             searchResultList = searchResultList.map((result) => {
                 result.content = result.content.slice(0,4096);
                 return result;
-            })
+            });
         }
 
         if (model.indexOf("deepseek") !== -1) {

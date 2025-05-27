@@ -4,7 +4,7 @@ import { createWorker, PSM } from 'tesseract.js';
 // 定义常量，方便修改配置
 const LANG = 'eng+chi_sim';
 const WORKER_THREADS = 3;
-const CONFIDENCE_THRESHOLD = 40;
+export const CONFIDENCE_THRESHOLD = 40;
 
 // 封装错误处理函数
 const handleError = (error: any, message: string) => {
@@ -13,7 +13,7 @@ const handleError = (error: any, message: string) => {
 };
 
 // 初始化 Tesseract worker
-const initializeWorker = async () => {
+export const initializeWorker = async () => {
   const worker = await createWorker(LANG, WORKER_THREADS, {
     langPath: pub.get_resource_path() + "/traineddata",
   });
@@ -27,7 +27,7 @@ const initializeWorker = async () => {
 };
 
 // 对识别结果进行后处理
-const postProcessText = (text: string) => {
+export const postProcessText = (text: string) => {
   return text
     .replace(/\s{2,}/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
@@ -35,7 +35,7 @@ const postProcessText = (text: string) => {
 };
 
 // 过滤低置信度行
-const filterLowConfidenceLines = (lines: any[], threshold: number) => {
+export const filterLowConfidenceLines = (lines: any[], threshold: number) => {
   return lines
     .filter(line => line.confidence > threshold)
     .map(line => line.text)

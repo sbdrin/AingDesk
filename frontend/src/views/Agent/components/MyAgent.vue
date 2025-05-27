@@ -1,24 +1,23 @@
 <template>
     <div class="flex flex-wrap gap-10 justify-start items-center">
-        <NCard hoverable class="w-200 cursor-pointer" v-for="item in myAgentList" :key="item.create_time"
+        <n-card hoverable class="w-200 cursor-pointer" v-for="item in myAgentList" :key="item.create_time"
             @click="chooseAgentForChat(item)">
             <div class="flex justify-between items-center">
                 <div class="agent-card">
-                    <span class="emoji-span">{{ item.icon ? item.icon : "😀" }}</span>
+                    <span class="emoji-span mr-10">{{ item.icon ? item.icon : "😀" }}</span>
                     <span class="text">{{
                         item.agent_title
                         }}</span>
                 </div>
-                <NDropdown trigger="click" :options="options" @select="(key) => handleAgentOperation(key, item)">
+                <n-dropdown trigger="click" :options="options" @select="(key:any) => handleAgentOperation(key, item)">
                     <i class="i-tdesign:ellipsis w-20 h-20 cursor-pointer" @click.stop></i>
-                </NDropdown>
+                </n-dropdown>
             </div>
-        </NCard>
+        </n-card>
     </div>
 </template>
 
 <script setup lang="ts">
-import { NCard, NDropdown, } from 'naive-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { chooseAgentForChat, handleAgentOperation } from "@/views/Agent/controller"

@@ -1,27 +1,26 @@
 <template>
-    <n-modal :show="addSupplierModel">
-        <n-card :title="isEditModelFormData ? $t('修改模型') : $t('添加模型')" class="add-model-wrapper">
-            <n-form :model="addModelFormData" :rules="addModelRules" ref="addModelForm">
-                <n-form-item :label="$t('模型ID')" path="modelName">
-                    <n-input :placeholder="$t('请输入模型ID')" v-model:value="addModelFormData.modelName"
-                        :on-update:value="modelIdChange" :disabled="isEditModelFormData" />
-                </n-form-item>
-                <n-form-item :label="$t('模型别名')" path="title">
-                    <n-input :placeholder="$t('请输入模型别名')" v-model:value="addModelFormData.title" />
-                </n-form-item>
-                <n-form-item :label="$t('模型功能')" path="capability">
-                    <n-select :options="capabilityOptions" multiple v-model:value="addModelFormData.capability"
-                        :on-update:value="capabilityChange" />
-                </n-form-item>
-            </n-form>
-            <template #footer>
-                <div class="action-wrapper">
-                    <n-button @click="closeAddModel">{{ $t('取消') }}</n-button>
-                    <n-button type="primary" @click="confirmAddModel">{{ isEditModelFormData ? $t('确认') : $t('添加')
-                        }}</n-button>
-                </div>
-            </template>
-        </n-card>
+    <n-modal v-model:show="addSupplierModel" :close-on-esc="false" :mask-closable="false" preset="card" draggable
+        :title="isEditModelFormData ? $t('修改模型') : $t('添加模型')" class="add-model-wrapper" style="width: 480px;" segmented>
+        <n-form :model="addModelFormData" :rules="addModelRules" ref="addModelForm">
+            <n-form-item :label="$t('模型ID')" path="modelName">
+                <n-input :placeholder="$t('请输入模型ID')" v-model:value="addModelFormData.modelName"
+                    :on-update:value="modelIdChange" :disabled="isEditModelFormData" />
+            </n-form-item>
+            <n-form-item :label="$t('模型别名')" path="title">
+                <n-input :placeholder="$t('请输入模型别名')" v-model:value="addModelFormData.title" />
+            </n-form-item>
+            <n-form-item :label="$t('模型功能')" path="capability">
+                <n-select :options="capabilityOptions" multiple v-model:value="addModelFormData.capability"
+                    :on-update:value="capabilityChange" />
+            </n-form-item>
+        </n-form>
+        <template #footer>
+            <div class="action-wrapper">
+                <n-button @click="closeAddModel">{{ $t('取消') }}</n-button>
+                <n-button type="primary" @click="confirmAddModel">{{ isEditModelFormData ? $t('确认') : $t('添加')
+                }}</n-button>
+            </div>
+        </template>
     </n-modal>
 </template>
 

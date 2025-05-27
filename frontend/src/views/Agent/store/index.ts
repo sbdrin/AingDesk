@@ -26,6 +26,10 @@ const useAgentStore = defineStore("agentStore", () => {
     const currentAgent = ref<AgentItemDto | null>()
     // 当前对话的智能体
     const currentChatAgent = ref<AgentItemDto | null>()
+    // 等待删除的agent
+    const agentForDel = ref<AgentItemDto>()
+    // 删除agent的弹窗
+    const delAgentShow = ref(false)
     return {
         agentShow,
         agentList,
@@ -34,7 +38,9 @@ const useAgentStore = defineStore("agentStore", () => {
         isEditAgent,
         chatForAgent,
         currentAgent,
-        currentChatAgent
+        currentChatAgent,
+        agentForDel,
+        delAgentShow
     }
 })
 

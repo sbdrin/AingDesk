@@ -5,7 +5,7 @@ import { eventBUS } from "@/views/Home/utils/tools"
 import { sendLog } from "@/views/Home/controller"
 import { create_chat, getChatInfo } from "@/views/Sider/controller"
 import { message, } from "@/utils/naive-tools"
-import type { ChatInfo, MultipeQuestionDto } from "@/views/Home/dto"
+import type { ChatInfo, MultipeQuestionDto, MultipleModelListDto } from "@/views/Home/dto"
 import i18n from "@/lang";
 
 import { getSiderStoreData } from "@/views/Sider/store"
@@ -28,24 +28,40 @@ type ChatParams = {
     doc_files?: string
     images?: string
     regenerate_id?: string
+    [key: string]: any
 }
-export async function sendChat(params: ChatParams) {
-    const { currentModel, } = getHeaderStoreData()
+export async function sendChat(params: ChatParams, multiModelList?: Array<MultipleModelListDto>) {
+    const { currentModel, multipleModelList } = getHeaderStoreData()
     const { currentContextId, } = getSiderStoreData()
     const { targetNet, } = getSoftSettingsStoreData()
     const { currentTalkingChatId, isInChat, chatHistory, } = getChatContentStoreData()
     const { activeKnowledgeForChat, } = getKnowledgeStoreData()
     const { netActive, temp_chat, mcpListChoosed } = getChatToolsStoreData()
     const { currentSupplierName } = getThirdPartyApiStoreData()
+    const { compare_id } = getChatToolsStoreData()
+    const chatAxiosArr = []
 
-
+    /********** 单模型及多模型下的ollama处理 ***********/
+    // 单模型下的model和parameters
     let model, parameters;
-    if (currentSupplierName.value == "ollama") {
-        [model, parameters] = currentModel.value.split(":")
+    if (multiModelList) {
+        // 多模型ollama处理
+        for (let modelParams of multiModelList) {
+            if (modelParams.supplierName == "ollama") {
+                [modelParams.model, modelParams.parameters] = modelParams.model.split(":")
+            }
+        }
     } else {
-        model = currentModel.value
-        parameters = ""
+        // 单模型ollama处理
+        if (currentSupplierName.value == "ollama") {
+            [model, parameters] = currentModel.value.split(":")
+        } else {
+            model = currentModel.value
+            parameters = ""
+        }
     }
+
+    /********** 发送对话 ***********/
     // 如果当前对话不存在则创建对话
     try {
         if (!currentContextId.value) {
@@ -60,33 +76,73 @@ export async function sendChat(params: ChatParams) {
             }
         }
 
-        await axios.post("http://127.0.0.1:7071/chat/chat", {
-            model,
-            parameters,
-            context_id: currentContextId.value,
-            search: netActive.value ? targetNet.value : "",
-            rag_list: JSON.stringify(activeKnowledgeForChat.value),
-            supplierName: currentSupplierName.value,
-            temp_chat: String(temp_chat.value),
-            mcp_servers: mcpListChoosed.value,
-            ...params
-        }, {
-            responseType: 'text',
-            onDownloadProgress: (progressEvent: any) => {
-                // 获取当前接收到的部分响应数据
-                const currentResponse = progressEvent.event.currentTarget.responseText;
-                // 防止切换带来的错误
-                if (currentTalkingChatId.value == currentContextId.value) chatHistory.value.set(currentChat!, { content: currentResponse, stat: { model: currentModel.value }, id: "" })
+        if (!multiModelList) {
+            // 单模型下发送对话
+            await axios.post("http://127.0.0.1:7071/chat/chat", {
+                model,
+                parameters,
+                supplierName: currentSupplierName.value,
+                context_id: currentContextId.value,
+                search: netActive.value ? targetNet.value : "",
+                rag_list: JSON.stringify(activeKnowledgeForChat.value),
+                temp_chat: String(temp_chat.value),
+                mcp_servers: mcpListChoosed.value,
+                ...params
+            }, {
+                responseType: 'text',
+                onDownloadProgress: (progressEvent: any) => {
+                    // 获取当前接收到的部分响应数据
+                    const currentResponse = progressEvent.event.currentTarget.responseText;
+                    // 防止切换带来的错误
+                    if (currentTalkingChatId.value == currentContextId.value) chatHistory.value.set(currentChat!, { content: currentResponse, stat: { model: currentModel.value }, id: "" })
+                }
+            })
+        } else {
+            
+            for (let i = 0; i < multiModelList!.length; i++) {
+                const chatAxios = axios.post("http://127.0.0.1:7071/chat/chat", {
+                    model: multiModelList![i].model,
+                    parameters: multiModelList![i].parameters,
+                    supplierName: multiModelList![i].supplierName,
+                    context_id: currentContextId.value,
+                    search: netActive.value ? targetNet.value : "",
+                    rag_list: JSON.stringify(activeKnowledgeForChat.value),
+                    temp_chat: String(temp_chat.value),
+                    mcp_servers: mcpListChoosed.value,
+                    compare_id: compare_id.value,
+                    ...params
+                }, {
+                    responseType: 'text',
+                    onDownloadProgress: (progressEvent: any) => {
+                        // 获取当前接收到的部分响应数据
+                        const currentResponse = progressEvent.event.currentTarget.responseText;
+                        // 防止切换带来的错误
+                        if (currentTalkingChatId.value == currentContextId.value) {
+                            const chat = chatHistory.value.get(currentChat!)
+                            chat!.content = [...chat?.content as string[]]
+                            chat!.content[i] = currentResponse;
+                            (chat!.stat as any)[i] = { model: multiModelList![i].model } as any
+                            chat!.id = ""
+                            // chatHistory.value.set(currentChat!, { content: currentResponse, stat: { model: currentModel.value }, id: "" })
+                        }
+                    }
+                })
+
+                chatAxiosArr.push(chatAxios)
             }
-        })
+        }
+
+        await Promise.all(chatAxiosArr)
         /***** 请求结束行为可以在此执行 *****/
         const lastChhat = await post("/chat/get_last_chat_history", { context_id: currentContextId.value })
-        // 获取最后提条对话信息并拼接到对话历史中
+        // 获取最后一条对话信息并拼接到对话历史中
         if (chatHistory.value.get(currentChat!)) {
             // chatHistory.value.get(params.user_content)!.stat = lastChhat.message.eval_count
             Object.assign(chatHistory.value.get(currentChat!)!.stat as Object, lastChhat.message.stat)
             chatHistory.value.get(currentChat!)!.search_result = lastChhat.message.search_result as Array<any>
             chatHistory.value.get(currentChat!)!.id = lastChhat.message.id
+
+            console.log(chatHistory.value)
         }
         // 渲染mermaid
         eventBUS.$emit("answerRendered")
@@ -186,7 +242,6 @@ export function removeFile(index: number) {
     const fileName = questionFileList.value.splice(index, 1)
     questionFiles.value.splice(index, 1)
     removeFileFromeCache(fileName[0])
-    console.log(questionFilesCache.value)
 }
 
 /**
@@ -197,7 +252,6 @@ export function removeImage(index: number) {
     const fileName = questionImageList.value.splice(index, 1)
     questionImages.value.splice(index, 1)
     removeFileFromeCache(fileName[0])
-    console.log(questionFilesCache.value)
 }
 
 
@@ -261,8 +315,10 @@ export function scrollMove() {
  */
 export function sendChatToModel() {
     const { isInChat, userScrollSelf, chatHistory } = getChatContentStoreData()
-    const { questionContent, questionFiles, questionImages, questionFileList, questionImageList, questionFilesCache } = getChatToolsStoreData()
-    const { currentModel, } = getHeaderStoreData()
+    const { questionContent, questionFiles, questionImages, questionFileList, questionImageList, questionFilesCache, compare_id } = getChatToolsStoreData()
+    const { currentModel, multipleModelList } = getHeaderStoreData()
+    const { currentSupplierName } = getThirdPartyApiStoreData()
+
     if (!questionContent.value.trim()) return
 
     if (!currentModel.value) {
@@ -271,21 +327,50 @@ export function sendChatToModel() {
     }
     isInChat.value = true
     userScrollSelf.value = false
-    // 將聊天加入到对话历史
+    /********** 准备对话的key，用于拼装对话历史记录 **********/
+    // 获取清除所有空格的提问内容
     const formatQuestionContent = questionContent.value.replace(/\n/g, '<br>')
-    // 拼接完整key
+    // 拼接对话历史的完整key
     const chatKey = {
         content: formatQuestionContent,
         files: questionFiles.value,
         images: questionImages.value
     }
-    chatHistory.value.set(chatKey, { content: "", stat: { model: currentModel.value }, search_result: [] })
+    // 立即滚动到最底部
     nextTick(() => eventBUS.$emit("chat-tool-do-scroll"))
-    sendChat({
-        user_content: formatQuestionContent,
-        images: questionImages.value.join(","),
-        doc_files: questionFiles.value.join(",")
-    })
+
+
+    /********** 进行单模型和多模型的对话记录拼接 ***********/
+    if (multipleModelList.value.length == 0) { // 如果是单模型，则直接拼装
+        // 将chatKey拼装到对话历史记录中
+        chatHistory.value.set(chatKey, { content: "", stat: { model: currentModel.value }, search_result: [] })
+        // 单模型请求
+        sendChat({
+            user_content: formatQuestionContent,
+            images: questionImages.value.join(","),
+            doc_files: questionFiles.value.join(",")
+        })
+    } else { // 如果是多模型，则进行多模型拼装
+        const chatModelParams: MultipleModelListDto[] = [...multipleModelList.value, { model: currentModel.value, supplierName: currentSupplierName.value }]
+        // 多模型对话历史拼装,基本结构
+        chatHistory.value.set(chatKey, { content: [], stat: [], search_result: [] })
+        // 遍历多模型列表，完善多模型历史对话结构
+        for (let i = 0; i < chatModelParams.length; i++) {
+            const chat = chatHistory.value.get(chatKey)!;
+            chat.content = [...(chat.content as string[])];
+            chat.content[i] = "";
+            chat.stat = chat.stat as any[];
+            chat.stat[i] = { model: chatModelParams[i].model };
+        }
+        // 多模型请求
+        sendChat({
+            user_content: formatQuestionContent,
+            images: questionImages.value.join(","),
+            doc_files: questionFiles.value.join(",")
+        }, chatModelParams)
+    }
+
+
     questionContent.value = ""
     questionFiles.value = []
     questionImages.value = []

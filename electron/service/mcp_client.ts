@@ -474,6 +474,49 @@ export class MCPClient {
         // 处理工具调用
         if (Object.keys(toolCallMap).length > 0) {
             messages = await this.callTools(toolCallMap, messages, toolsContent);
+            let last_message = messages[messages.length - 1];
+            if(last_message.content) {
+                // 内容以<end>开头，且以</end>结束的,不递归工具调用，原样输出
+                let content = last_message.content.toString().trim()
+                let toolMessage = JSON.parse(content);
+                if(toolMessage && toolMessage.length > 0 && toolMessage[0].text){
+                    content = toolMessage[0].text;
+                    if(content.startsWith("<end>") && content.endsWith("</end>")){
+                        content = content.replace("<end>", "").replace("</end>", "").trim();
+                        let chunk = {
+                            created_at: Date.now(),
+                            index: 0,
+                            choices: [
+                                {
+                                    finish_reason: "stop",
+                                    delta: {
+                                        content: content
+                                    }
+                                }
+                            ]
+                        }
+                        this.callback(chunk);
+                        return;
+                    }
+
+                    if(content.startsWith("<echo>") && content.endsWith("</echo>")){
+                        content = content.replace("<echo>", "").replace("</echo>", "").trim();
+                        let chunk = {
+                            created_at: Date.now(),
+                            index: 0,
+                            choices: [
+                                {
+                                    finish_reason: "",
+                                    delta: {
+                                        content: content
+                                    }
+                                }
+                            ]
+                        }
+                        this.callback(chunk);
+                    }
+                }
+            }
             // 递归处理工具调用
             await this.handleToolCalls(availableTools, messages, true);
         }

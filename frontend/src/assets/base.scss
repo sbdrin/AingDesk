@@ -7,7 +7,7 @@
     --bt-theme-danger: #F56C6C;
     --bt-theme-info: #2080f0;
     // 主题悬浮色
-    --bt-theme-color-hover: rgba(29, 149, 52,.3);
+    --bt-theme-color-hover: rgba(29, 149, 52, .3);
     // 边距
     --bt-mg-normal: 20px;
     --bt-mg-small: 10px;
@@ -119,6 +119,14 @@ $list-item-hover: var(--bt-list-item-hover);
     gap: 10px;
 }
 
+/**
+* 标准阴影
+*/
+@mixin shadow {
+    box-shadow: 0 1px 2px -2px rgba(0, 0, 0, .08), 0 3px 6px 0 rgba(0, 0, 0, .06), 0 5px 12px 4px rgba(0, 0, 0, .04);
+}
+
+
 /********** 通用样式块 **********/
 // 弹窗底部按钮组
 .modal-footer-btns {
@@ -126,6 +134,11 @@ $list-item-hover: var(--bt-list-item-hover);
     justify-content: flex-end;
 }
 
+
+
+.n-modal .n-card__content {
+    padding-top: 20px;
+}
 
 
 /********** 对话窗口混入样式 ***********/
@@ -264,7 +277,7 @@ $list-item-hover: var(--bt-list-item-hover);
 
 
 /********** naive-ui样式覆盖 **********/
-.n-card > .n-card-header {
+.n-card>.n-card-header {
     padding-top: 10px;
     padding-bottom: 10px;
 }

@@ -75,11 +75,19 @@ export function chooseAgentForChat(agent: AgentItemDto) {
 
 
 /**
- * @description 打开智能体
+ * @description 打开智能体弹窗
  */
 export function openAgent() {
     const { agentShow } = getAgentStoreData()
     agentShow.value = true
+}
+
+/**
+ * @description 关闭智能体弹窗
+ */
+export function closeAgent() {
+    const { agentShow } = getAgentStoreData()
+    agentShow.value = false 
 }
 
 /**
@@ -93,32 +101,35 @@ export async function getAgentInfo() {
  * @description 删除智能体
  */
 export async function removeAgent(agent: AgentItemDto) {
-    const dialog = useDialog({
-        title: "提示",
-        content: () => <span class="flex justify-start items-center mt-20"><i class="i-jam:alert-f w-24 h-24 text-[#E6A23C]"></i> {$t("是否确认删除智能体[{0}]?删除后无法恢复", [agent.agent_name])}</span>,
-        onOk: async () => {
-            await doRemove()
-            dialog.destroy()
-        },
-        onCancel: () => {
-            dialog.destroy()
-        },
-        style: {
-            width: "480px"
-        }
-    })
+    const {delAgentShow,agentForDel} = getAgentStoreData()
+    delAgentShow.value = true
+    agentForDel.value = agent
+}
 
+/**
+ * @description 取消删除agent
+ */
+export function cancelDelAgent() {
+    const {delAgentShow} = getAgentStoreData()
+    delAgentShow.value = false
+}
 
-    async function doRemove() {
-        try {
-            await post("/agent/remove_agent", { agent_name: agent.agent_name })
-            message.success($t("智能体删除成功"))
-            getAgentList()
-        } catch (error) {
-            sendLog(error as Error)
-        }
+/**
+ * @description 确认删除agent
+ */
+export async function confirmDelAgent() {
+    const {agentForDel} = getAgentStoreData() 
+    try {
+        await post("/agent/remove_agent", { agent_name: agentForDel.value!.agent_name })
+        message.success($t("智能体删除成功"))
+        getAgentList()
+        cancelDelAgent()
+    } catch (error) {
+        sendLog(error as Error)
     }
 }
+
+
 
 
 /**

@@ -3,17 +3,17 @@
         <n-scrollbar style="height: 200px;">
             <n-list-item v-for="item in supplierModelList" :key="item.modelName" v-if="supplierModelList.length">
                 <div class="model-item">
-										<div class="flex items-center justify-start gap-1.25">
-												<span>{{ item.title }}</span>
-												<n-tooltip trigger="hover">
-														<template #trigger>
-																<i class="i-proicons:text-edit-style w-16 h-16 mr-20 cursor-pointer"
-																		@click="handleModelDataChange(item)"></i>
-														</template>
-														{{ $t("修改模型") }}
-												</n-tooltip>
-												<n-tag v-for="_item in item.capability" size="small">{{ _item }}</n-tag>
-										</div>
+                    <div class="flex items-center justify-start gap-1.25">
+                        <span>{{ item.title }}</span>
+                        <n-tooltip trigger="hover">
+                            <template #trigger>
+                                <i class="i-proicons:text-edit-style w-16 h-16 mr-20 cursor-pointer"
+                                    @click="handleModelDataChange(item)"></i>
+                            </template>
+                            {{ $t("修改模型") }}
+                        </n-tooltip>
+                        <n-tag v-for="_item in item.capability" size="small">{{ _item }}</n-tag>
+                    </div>
                     <div class="operation">
                         <n-switch size="small" v-model:value="item.status"
                             @update:value="(val: any) => modelStatusChange(item.modelName, val)">
@@ -32,13 +32,13 @@
 import { useI18n } from 'vue-i18n';
 import { getThirdPartyApiStoreData } from '../store'
 import {
-		modelStatusChange,
-		handleModelDataChange,
+    modelStatusChange,
+    handleModelDataChange,
     delModel,
 } from "../controller"
 const { t: $t } = useI18n()
 const {
-		supplierModelList,
+    supplierModelList,
     currentModelNameForEdiit,
     modelTitTemp,
 } = getThirdPartyApiStoreData()

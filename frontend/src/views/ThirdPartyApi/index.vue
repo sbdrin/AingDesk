@@ -1,10 +1,10 @@
 <template>
     <!-- 第三方api配置界面 -->
-    <n-modal :show="thirdPartyApiShow" preset="dialog" style="width: 740px;" :title="$t('第三方API配置')" :show-icon="false">
-        <template #close>
+    <n-modal v-model:show="thirdPartyApiShow" preset="card" style="width: 740px;" :title="$t('第三方API配置')" draggable segmented>
+        <!-- <template #close>
             <i class="i-tdesign:close-circle w-20 h-20 cursor-pointer text-[#909399]"
                 @click="thirdPartyApiShow = false"></i>
-        </template>
+        </template> -->
         <div class="api-config-wrapper" :segmented="{ content: true, footer: true }">
             <div class="api-config-content">
                 <!-- 服务商列表 -->
@@ -47,11 +47,21 @@
     <!-- 添加模型 -->
     <AddModel />
 
+    <!-- 删除模型 -->
+    <DelModelConfirm />
+
     <!-- 添加模型服务商 -->
     <AddSupplier />
+
+    <!-- 删除模型服务商 -->
+    <DelSupplierConfirm />
+
+
 </template>
 
 <script setup lang="tsx">
+import DelModelConfirm from './components/DelModelConfirm.vue';
+import DelSupplierConfirm from './components/DelSupplierConfirm.vue';
 import AddSupplier from './components/AddSupplier.vue';
 import AddModel from './components/AddModel.vue';
 import SupplierModelList from './components/SupplierModelList.vue';
@@ -101,7 +111,7 @@ getSupplierList()
                     padding-right: 20px;
                 }
 
-                
+
 
                 :deep(.n-list-item) {
                     padding-left: 5px
@@ -116,5 +126,4 @@ getSupplierList()
         }
     }
 }
-
 </style>

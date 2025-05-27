@@ -1,37 +1,35 @@
 <template>
-    <n-modal v-model:show="settingsShow" :close-on-esc="false" :closable="false" :mask-closable="false">
-        <n-card style="width: 49%;min-width: 920px;max-width: 1000px;" :title="$t('设置')">
-            <template #header-extra>
-                <i class="i-tdesign:close-circle w-24 h-24 cursor-pointer text-[#909399]"
-                    @click="settingsShow = false"></i>
-            </template>
-            <div class="ollama-url">
-                <n-input-group class="w-45%">
-                    <n-button>{{ $t("Ollama接口地址") }}</n-button>
-                    <n-input placeholder="请填写ollama接入地址" v-model:value="ollamaUrl" />
-                    <n-button type="primary" @click="setOllamaUrl">{{ $t("保存") }}</n-button>
+    <n-modal v-model:show="settingsShow" :close-on-esc="false" :closable="false" :mask-closable="false" preset="card"
+        :title="$t('设置')" style="width: 49%;min-width: 920px;max-width: 1000px;" draggable segmented>
+        <template #header-extra>
+            <i class="i-tdesign:close-circle w-24 h-24 cursor-pointer text-[#909399]" @click="settingsShow = false"></i>
+        </template>
+        <div class="ollama-url">
+            <n-input-group class="w-45%">
+                <n-button>{{ $t("Ollama接口地址") }}</n-button>
+                <n-input placeholder="请填写ollama接入地址" v-model:value="ollamaUrl" />
+                <n-button type="primary" @click="setOllamaUrl">{{ $t("保存") }}</n-button>
+            </n-input-group>
+            <div class="notice" v-if="!isInstalledManager">{{ $t("当前ollama地址不可用") }}</div>
+        </div>
+        <div class="mt-20" v-if="modelList.length == 0">{{ $t("首次使用，请选择要安装的模型") }}</div>
+        <n-divider style="margin:20px 0"></n-divider>
+        <div class="mt-20" :class="{ mask: !ollamaUrl }">
+            <div class="flex justify-between items-center mb-10">
+                <n-input-group>
+                    <n-input v-model:value="search" @keydown.enter.native="handleSearch" :style="{ width: '220px' }"
+                        :placeholder='`${$t("如:")} deepseek-r1`' />
+                    <n-button type="primary" @click="handleSearch" ghost>
+                        {{ $t("搜索") }}
+                    </n-button>
                 </n-input-group>
-                <div class="notice" v-if="!isInstalledManager">{{ $t("当前ollama地址不可用") }}</div>
+                <n-radio-group v-model:value="modeType" @update:value="handleSearch">
+                    <n-radio-button v-for="tl in toolsList" :key="tl.value" :value="tl.value" :label="tl.label" />
+                </n-radio-group>
             </div>
-            <div class="mt-20" v-if="modelList.length == 0">{{ $t("首次使用，请选择要安装的模型") }}</div>
-
-            <div class="mt-20" :class="{ mask: !ollamaUrl }">
-                <div class="flex justify-between items-center mb-10">
-                    <n-input-group>
-                        <n-input v-model:value="search" @keydown.enter.native="handleSearch" :style="{ width: '220px' }"
-                            :placeholder='`${$t("如:")} deepseek-r1`' />
-                        <n-button type="primary" @click="handleSearch" ghost>
-                            {{ $t("搜索") }}
-                        </n-button>
-                    </n-input-group>
-                    <n-radio-group v-model:value="modeType" @update:value="handleSearch">
-                        <n-radio-button v-for="tl in toolsList" :key="tl.value" :value="tl.value" :label="tl.label" />
-                    </n-radio-group>
-                </div>
-                <n-data-table :columns="modelColumns" :data="filterList" :pagination="pagination" style="height: 400px;"
-                    flex-height />
-            </div>
-        </n-card>
+            <n-data-table :columns="modelColumns" :data="filterList" :pagination="pagination" style="height: 400px;"
+                flex-height />
+        </div>
     </n-modal>
 
     <!-- 安装进度 -->

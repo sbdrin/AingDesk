@@ -61,6 +61,8 @@ export class DocumentParser {
         '.gif': imageParse,
         '.bmp': imageParse,
         '.webp': imageParse,
+        '.ppm': imageParse,
+        '.tiff': imageParse,
 
         // Markdown文件
         '.md': txtParse,

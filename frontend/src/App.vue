@@ -8,7 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import {openSoftSettings} from "@/views/SoftSettings/controller/index"
+import { getGlobalStore } from "./stores/global";
+import { openSoftSettings } from "@/views/SoftSettings/controller/index"
 
 import useIndexStore, { getIndexStore } from './views/Home/store';
 import { storeToRefs } from 'pinia';
@@ -26,6 +27,7 @@ const { themeMode, targetNet } = getSoftSettingsStoreData()
 const { knowledgeDragable, } = getKnowledgeStoreData()
 const { welcomeShow, } = getIndexStore()
 const { guideActive, } = getChatContentStoreData()
+const { modalTitleBg } = getGlobalStore()
 
 // 临时代码——打开设置弹窗
 // openSoftSettings()
@@ -53,36 +55,11 @@ onMounted(() => {
   targetNet.value = storage.searchEngine ? storage.searchEngine : ""
 })
 
-/********** 拖拽上传 **********/
-// let dragEnterCount = 0;
-// // 在 document 上监听 dragenter 事件
-// document.addEventListener('dragenter', (event) => {
-//   event.preventDefault();
-//   dragEnterCount++;
-//   console.log(dragEnterCount)
-//   if (dragEnterCount === 1) {
-//     // 显示遮罩层
-//     knowledgeDragable.value = true;
-//   }
-// });
-
-// // 在 document 上监听 dragover 事件
-// document.addEventListener('dragover', (event) => {
-//   // 阻止默认行为，允许放置
-//   event.preventDefault();
-// });
-
-// // 在 document 上监听 dragleave 事件
-// document.addEventListener('dragleave', (event) => {
-//   dragEnterCount--;
-//   if (dragEnterCount === 0) {
-//     // 隐藏遮罩层
-//     knowledgeDragable.value = false;
-//   }
-// });
 </script>
 
-<style scoped>
+<style lang="scss">
+@use "@/assets/base.scss";
+
 .drag-upload {
   position: fixed;
   top: 0;
@@ -91,5 +68,11 @@ onMounted(() => {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 10000;
+}
+
+// 弹窗统一header样式
+.n-modal .n-card-header {
+  background-color: v-bind(modalTitleBg);
+  font-size: 16px;
 }
 </style>

@@ -23,6 +23,7 @@ import { getHeaderStoreData } from "@/views/Header/store"
 import { getChatContentStoreData } from "@/views/ChatContent/store"
 import { getChatToolsStoreData } from "@/views/ChatTools/store"
 import { getAnswerStoreData } from "../store"
+import { getThirdPartyApiStoreData } from "@/views/ThirdPartyApi/store"
 
 
 
@@ -47,7 +48,7 @@ const $t = i18n.global.t
 /**
  * @description 复制回答内容
  */
-const { copy } = useClipboard({ source: "" })
+const { copy } = useClipboard({ source: "", legacy: true })
 export async function copyContent(text: string) {
     await copy(text.replace(/<div class="thought-placeholder">(.*?)<\/div>/gs, ""))
     message.success($t("复制成功"))
@@ -60,7 +61,7 @@ export const answerLogo = (model: string) => {
     let logo = null
     Object.keys(logos).forEach(item => {
         {
-            if (model.includes(item)) {
+            if (model && model.includes(item)) {
                 logo = logos[item]
             }
         }
@@ -77,30 +78,42 @@ export const answerLogo = (model: string) => {
  * @description 重新回答
  */
 export function answerAgain(question: MultipeQuestionDto, id: string) {
+    const { multipleModelList } = getHeaderStoreData()
     const { currentModel, } = getHeaderStoreData()
+    const { currentSupplierName } = getThirdPartyApiStoreData()
     const { isInChat, chatHistory, } = getChatContentStoreData()
     if (isInChat.value) {
         message.warning($t("当前正在回答，请稍后"))
     } else {
         isInChat.value = true
         // 拼接完整key  
-        // TODO:此处暂时的方案是追加一个重新回答的记录，后续根据情况决定是否优化
+        // 此处暂时的方案是追加一个重新回答的记录，后续根据情况决定是否优化
         const chatKey = {
             content: question.content.replace(/^\d+--/, ''),
             files: question.files,
             images: question.images
         }
         chatHistory.value.set(chatKey, { content: "", stat: { model: currentModel.value }, search_result: [] })
-        sendChat({
-            user_content: chatKey.content,
-            images: chatKey.images?.join(","),
-            doc_files: chatKey.files?.join(","),
-            regenerate_id: id
-        })
+        if (multipleModelList.value.length) {
+            const modelList = [...multipleModelList.value, { model: currentModel.value, supplierName: currentSupplierName.value }]
+            sendChat({
+                user_content: chatKey.content,
+                images: chatKey.images?.join(","),
+                doc_files: chatKey.files?.join(","),
+                regenerate_id: id
+            }, modelList)
+        } else {
+            sendChat({
+                user_content: chatKey.content,
+                images: chatKey.images?.join(","),
+                doc_files: chatKey.files?.join(","),
+                regenerate_id: id
+            })
+        }
     }
 }
 
-// TODO:目前不确定AI返回的latex公式是否正确，参考Latex和Katex的规范，先全面使用$$...$$代替
+// 目前不确定AI返回的latex公式是否正确，参考Latex和Katex的规范，先全面使用$$...$$代替
 /**
  * @description 替换数学公式中的分隔符为$$
  */
@@ -115,45 +128,6 @@ export function replaceLatexMathDelimiters(text: string) {
     return text;
 }
 
-/**
- * @description markdown渲染结束后立即进行工具、思考等处理过程
- */
-export function dealThinkAndTools() {
-    let timer: any = null
-    const { questionContent, } = getChatToolsStoreData()
-    const { markdownRef} = getAnswerStoreData()
-    return () => {
-        if (timer) {
-            clearTimeout(timer)
-            timer = null
-        } else {
-            timer = setTimeout(() => {
-                // 处理工具条
-                const toolHeaders = markdownRef.value?.querySelectorAll(".tool-header")
-                if (toolHeaders?.length) {
-                    toolHeaders.forEach(item => {
-                        const copyBtns = item.querySelectorAll(".tool-copy")
-                        const referenceBtns = item.querySelectorAll(".tool-reference")
-                        // 监听工具栏的拷贝内容
-                        copyBtns.forEach((copyBtn) => {
-                            copyBtn.addEventListener("click", () => {
-                                copy(decodeURIComponent((copyBtn as HTMLSpanElement).dataset.code as string))
-                                message.success($t("复制成功"))
-                            })
-                        })
-
-                        // 监听引用工具操作
-                        referenceBtns.forEach(referenceBtn => {
-                            referenceBtn.addEventListener("click", () => {
-                                questionContent.value = decodeURIComponent((referenceBtn as HTMLSpanElement).dataset.code as string)
-                            })
-                        })
-                    })
-                }
-            }, 300)
-        }
-    }
-}
 
 /**
  * @description 跳转到对应目标页

@@ -1,24 +1,30 @@
 <template>
-	<n-modal v-model:show="softSettingsShow" :mask-closable="false" :close-on-esc="false">
-		<n-card segmented title="软件设置" :style="{ width: 'auto' }" closable @close="closeSoftSettings">
-			<div class="soft-settings">
-				<div class="tabs">
-					<div class="tabs-item" :class="{ active: currentSettingTab == 'general' }"
-						@click="changeSettingTab('general')">{{ $t('常规设置') }}</div>
-					<div class="tabs-item" :class="{ active: currentSettingTab == 'mcp' }"
-						@click="changeSettingTab('mcp')">{{ $t('MCP服务器') }}</div>
-				</div>
-				<div class="tabs-panels" :style="{ width: settingPanelWidth + 'px', borderLeft: settingPanelBorder }">
-					<GeneralSettings v-if="currentSettingTab == 'general'" />
-					<McpServer v-if="currentSettingTab == 'mcp'" />
-				</div>
+	<n-modal v-model:show="softSettingsShow" :mask-closable="false" :close-on-esc="false" preset="card" draggable
+		segmented title="软件设置" :style="{ width: 'auto' }" closable @close="closeSoftSettings">
+		<div class="soft-settings">
+			<div class="tabs">
+				<div class="tabs-item" :class="{ active: currentSettingTab == 'general' }"
+					@click="changeSettingTab('general')">{{ $t('常规设置') }}</div>
+				<div class="tabs-item" :class="{ active: currentSettingTab == 'mcp' }" @click="changeSettingTab('mcp')">
+					{{ $t('MCP服务器') }}</div>
 			</div>
-			
-		</n-card>
+			<div class="tabs-panels" :style="{ width: settingPanelWidth + 'px', borderLeft: settingPanelBorder }"
+				style="overflow:hidden">
+				<GeneralSettings v-if="currentSettingTab == 'general'" />
+				<McpServer v-if="currentSettingTab == 'mcp'" />
+			</div>
+		</div>
 	</n-modal>
+
+	<!-- 更改用户数据存储位置 -->
+	<ChangeDirWarning />
+	<!-- 删除MCP服务器问询 -->
+	<DelMcpConfirm />
 </template>
 
 <script setup lang="ts">
+import DelMcpConfirm from './components/DelMcpConfirm.vue';
+import ChangeDirWarning from './components/ChangeDirWarning.vue';
 import { getGlobalStore } from '@/stores/global';
 import { getSoftSettingsStoreData } from './store';
 import GeneralSettings from './components/GeneralSettings.vue';

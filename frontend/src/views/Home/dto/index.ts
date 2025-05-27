@@ -27,22 +27,26 @@ export type MultipeQuestionDto = {
     files?: string[],
     images?: string[]
 }
+
+// 回答信息stat内容实体
+export type Stat = {
+    model?: string,
+    created_at?: string,
+    total_duration?: string,
+    load_duration?: string,
+    prompt_eval_count?: string,
+    prompt_eval_duration?: string,
+    eval_count?: string,
+    eval_duration?: string,
+}
+
 // 回答信息实体
 export type AnswerInfo = {
-    content: string,
+    content: string | string[],
     id?: string
-    stat?: {
-        model?: string,
-        created_at?: string,
-        total_duration?: string,
-        load_duration?: string,
-        prompt_eval_count?: string,
-        prompt_eval_duration?: string,
-        eval_count?: string,
-        eval_duration?: string,
-    },
+    stat?: Stat | Stat[],
     search_result?: Array<{ content: string; link: string; title: string }>,
-    tools_result?:Array<string>
+    tools_result?: Array<string>
 
 }
 // 对话信息实体
@@ -105,11 +109,11 @@ export type SupplierModelItem = {
 }
 // 添加第三方下属模型
 export type AddThirdPartySupplierMode = {
-	modelName: string;
-	capability: string[];
-	title: string;
-	supplierName?: string;
-	status?: boolean;
+    modelName: string;
+    capability: string[];
+    title: string;
+    supplierName?: string;
+    status?: boolean;
 };
 
 // 添加模型服务商表单数据
@@ -171,17 +175,24 @@ export type TestDocChunkParams = {
 
 // MCP服务器列表实体
 export type CloudMcpServerListDto = {
-	name: string;
-	description: string;
-	type: string;
-	command: string;
-	baseUrl: string;
-	env: string;
-	args: string;
-	isActive?: boolean;
+    name: string;
+    description: string;
+    type: string;
+    command: string;
+    baseUrl: string;
+    env: string;
+    args: string;
+    isActive?: boolean;
 };
 // 云端MCP列表实体
 export interface McpServerListDto extends CloudMcpServerListDto {
-	isActive: boolean;
-	tools: string[];
+    isActive: boolean;
+    tools: string[];
 };
+
+// 多模型对象列表
+export type MultipleModelListDto = {
+    model: string,
+    supplierName: string,
+    parameters?: string
+}

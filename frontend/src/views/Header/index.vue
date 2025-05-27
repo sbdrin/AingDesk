@@ -4,18 +4,10 @@
             <div class="flex items-center">
                 <i class="i-common:expand w-18 h-18 mr-10 cursor-pointer" v-if="isFold" @click="doExpand"></i>
             </div>
-            <n-popover trigger="click" placement="bottom-start" v-model:show="modelListShow">
-                <template #trigger>
-                    <div class="flex justify-start items-center gap-2.5 cursor-pointer" @click="modelListShow = true">
-                        <span>{{ showModel?showModel:$t('请选择模型') }}</span>
-                        <div class="choosed-model-handle">
-                            <i class="i-tdesign:chevron-down w-20 h-20"></i>
-                        </div>
-                    </div>
-                </template>
-                <ModelList />
-                <!-- <i class="i-ci:add-plus w-18 h-18"></i> 添加多模型按钮，暂时隐藏 -->
-            </n-popover>
+
+            <!-- 选择模型 -->
+            <ChooseModel v-model="currentModel" v-model:supplier="currentSupplierName"
+                @addModelChoose="addModelChoose" />
         </div>
         <div class="right-tools">
             <n-button type="success" @click="shareShow = true">
@@ -24,30 +16,45 @@
             </n-button>
         </div>
     </div>
-    <!-- 模型选择列表 -->
+
 
 </template>
 
 <script lang="tsx" setup>
-import ModelList from "./components/ModelList.vue";
+import ChooseModel from "./components/ChooseModel.vue";
 import { get_model_list, } from "@/views/Settings/controller"
 import { doExpand } from "@/views/Header/controller"
 import { useI18n } from "vue-i18n";
 import { getHeaderStoreData } from "./store";
 import { getSiderStoreData } from "../Sider/store";
 import { getKnowledgeStoreData } from "../KnowleadgeStore/store";
+import { getThirdPartyApiStoreData } from "../ThirdPartyApi/store";
+import { getChatToolsStoreData } from "../ChatTools/store";
+import { getRandomStringFromSet } from "@/utils/tools";
 
 const { t: $t } = useI18n()
-const { shareShow, showModel,modelListShow } = getHeaderStoreData()
+
+const { shareShow, currentModel, multipleModelList } = getHeaderStoreData()
 const { isFold, siderWidth, } = getSiderStoreData()
 const { activeKnowledge, knowledgeSiderWidth, } = getKnowledgeStoreData()
+const { currentSupplierName } = getThirdPartyApiStoreData()
+const { compare_id } = getChatToolsStoreData()
 
 /**
  * @description 获取模型列表
  */
 get_model_list()
 
-
+/**
+ * @description 添加模型选择器
+ */
+function addModelChoose() {
+    multipleModelList.value.push({
+        model: "",
+        supplierName: ""
+    })
+    compare_id.value = getRandomStringFromSet(16)
+}
 
 
 </script>
@@ -61,12 +68,7 @@ get_model_list()
     align-items: center;
     justify-content: space-between;
 
-    .choosed-model-handle {
-        @include base.row-flex-between;
-        gap: 0;
-        cursor: pointer;
-        justify-content: flex-start;
-    }
+
 
     .right-tools {
         display: flex;

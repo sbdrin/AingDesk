@@ -43,8 +43,7 @@ const checkIsVisionModel = async (supplierName: string, model: string): Promise<
     }
     if (supplierName !== 'ollama') {
         if (modelLower.indexOf('-vl') !== -1) return true;
-        const notVlist = ['qwen', 'deepseek', 'qwq', 'code', 'phi', 'gemma'];
-        return !notVlist.some(keyword => modelLower.indexOf(keyword) !== -1);
+        return false;
     }
     try {
         const modelListFile = path.resolve(pub.get_resource_path(), 'ollama_model.json');
@@ -212,6 +211,15 @@ const calculateContextLength = (history: any[]) => {
     return contextLength;
 }
 
+// 时间戳转2025-04-18T03:49:41.0108203Z格式
+const formatDate = (timestamp: number) => {
+    if(typeof timestamp !== 'number'){
+        return timestamp;
+    }
+    const date = new Date(timestamp * 1000);
+    return date.toISOString();
+}
+
 // 提取获取响应信息的函数
 const getResponseInfo = (chunk: any, isOllama: boolean, modelStr: string, resTimeMs: number) => {
     if (isOllama) {
@@ -229,7 +237,7 @@ const getResponseInfo = (chunk: any, isOllama: boolean, modelStr: string, resTim
         const nowTime = pub.time();
         return {
             model: modelStr,
-            created_at: chunk.created,
+            created_at: formatDate(chunk.created),
             total_duration: nowTime - chunk.created,
             load_duration: 0,
             prompt_eval_count: chunk.usage?.prompt_tokens || 0,
@@ -378,6 +386,11 @@ export class ToChatService {
                 modelInfo.contextLength = getModelContextLength(modelName);
             }
         }
+
+        if(compare_id && regenerate_id){
+            regenerate_id = '';
+        }
+        
         await chatService.update_chat_model(uuid, modelName, parameters as string, supplierName as string);
         const isVision = await this.isVisionModel(supplierName, modelName);
         let history = await chatService.build_chat_history(uuid, chatContext, modelInfo.contextLength, isTempChat, isVision);
@@ -516,6 +529,7 @@ export class ToChatService {
         let isThinking = false;
         let isThinkingEnd = false;
         const ResEvent = async (chunk) => {
+            
             if (!isOllama) resTimeMs = new Date().getTime();
             if(chunk.choices && chunk.choices.length === 0){
                 return;

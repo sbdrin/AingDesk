@@ -19,13 +19,18 @@ export const localBaiduSearch = async (query: string): Promise<SearchResult[]> =
         // 处理搜索结果数据
         const searchResults: SearchResult[] = data.map((result: any) => {
             const title = result?.title || "";
-            const link = result?.url;
+            let link = result?.url;
             const content = result?.abs || "";
             return { title, link, content };
         });
-
-        // 过滤掉没有链接的结果
-        let resultList = searchResults.filter((result) => result?.link);
+        
+        // 过滤掉没有链接和内容的结果
+        let resultList = []
+        for (const result of searchResults) {
+            if (result.link && result.title) {
+                resultList.push(result);
+            }
+        }
         resultList = await getUrlsContent(resultList);
         return resultList;
     } catch (error) {

@@ -50,7 +50,7 @@ defineProps<{ questionContent: MultipeQuestionDto }>()
 /**
  * @description 复制已有提问
  */
-const { copy } = useClipboard({ source: "" })
+const { copy } = useClipboard({ source: "",legacy: true })
 async function copyQuestion(text: string) {
     await copy(text)
     message.success($t("复制成功"))

@@ -35,6 +35,8 @@ const useSoftSettingsStore = defineStore("softSettings", () => {
 	const targetNet = ref('baidu');
 	// 版本号
 	const version = ref('1.0.0');
+	// 修改数据存储位置的提示弹窗
+	const changeDataPathShow = ref(false);
 	// 获取用户数据存储位置
 	const userDataPath = ref('');
 	// 数据迁移检查
@@ -96,6 +98,8 @@ const useSoftSettingsStore = defineStore("softSettings", () => {
 	const mcpConfigFileContent = ref('');
 	// 当前mcp配置备份
 	const currentMcpConfigBackup = ref<McpServerListDto>();
+	// 卸载MCP问询弹窗
+	const delMcpConfirmShow = ref(false);
 	return {
 		softSettingsShow,
 		themeMode,
@@ -123,6 +127,8 @@ const useSoftSettingsStore = defineStore("softSettings", () => {
 		mcpConfigFileShow,
 		mcpConfigFileContent,
 		currentMcpConfigBackup,
+		changeDataPathShow,
+		delMcpConfirmShow
 	};
 })
 

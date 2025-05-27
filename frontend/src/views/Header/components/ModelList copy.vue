@@ -47,15 +47,17 @@
 </template>
 
 <script setup lang="ts">
-// import { changeCurrentModel } from "@/views/Header/controller"
+import { changeCurrentModel } from "@/views/Header/controller"
+import { getThirdPartyApiStoreData } from '@/views/ThirdPartyApi/store';
 import { getHeaderStoreData } from '../store';
+import { getChatToolsStoreData } from '@/views/ChatTools/store';
 import { useI18n } from "vue-i18n";
 
 const { t: $t } = useI18n()
-const { modelListSource,  } = getHeaderStoreData()
-
-// 定义选择事件
-const emits = defineEmits(['chooseModel'])
+const { chooseModelVisible } = getHeaderStoreData()
+const { currentSupplierName, } = getThirdPartyApiStoreData()
+const { modelList, modelListSource, currentModel, modelListFilterKey, showModel, showModelList } = getHeaderStoreData()
+const { chatMask } = getChatToolsStoreData()
 
 // 展示模型列表
 const showModel_test = ref(false)
@@ -75,16 +77,25 @@ const showModelList_test = computed(() => {
     }
     return newList;
   })
-
-
-/**
- * @description 选中后将数据通过事件返回
- */
-function changeCurrentModel(model: string, option: any){
-    emits('chooseModel', {model, option})
+// 匹配服务商的列表集合
+const supplierCollection: any = {
+    Ollama: "Ollama",
+    qanwen: "百炼-通义千问"
 }
 
-
+// watch(showModel, (val) => {
+//     if (val) {
+//         chatMask.value = {
+//             status: false,
+//             notice: ""
+//         }
+//     } else {
+//         chatMask.value = {
+//             status: true,
+//             notice: $t("当前对话使用的模型已被禁用或删除，请重新启用或切换模型", [currentModel.value])
+//         }
+//     }
+// }, { immediate: true })
 </script>
 
 <style scoped lang="scss">

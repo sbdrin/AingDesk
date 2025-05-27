@@ -23,6 +23,8 @@ const useSiderStore = defineStore("siderStore", () => {
     const newChatTitle = ref("")
     // 当前对话标题
     const currentChatTitle = ref("")
+    // 清空对话列表弹窗
+    const chatClearConfirm = ref(false)
     return {
         siderWidth,
         isFold,
@@ -33,7 +35,8 @@ const useSiderStore = defineStore("siderStore", () => {
         contextIdForDel,
         contextIdForModify,
         newChatTitle,
-        currentChatTitle
+        currentChatTitle,
+        chatClearConfirm
     }
 })
 

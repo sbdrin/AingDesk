@@ -2,12 +2,12 @@
     <div :class="['think-wrapper', { 'is-close': isClose }]" ref="wrapperRef" v-if="content.replace(/\s/g, '')">
         <div class="has-thought cursor-pointer" @click="toggle">
             <span class="flex items-center gap-2.5 h-15 text-12px">
-                <i class="i-common:has-thought w-14 h-14"></i>{{ $t("调用结果:") }}
+                <i class="i-si:check-circle-fill w-16 h-16 text-[#fff]"></i>{{ $t("调用结果:") }}
                 [{{ mcpToolContent.tool_server }}--{{ mcpToolContent.tool_name }}]
             </span>
             <span>
-                <i class="i-common:arrow-up w-14 h-14 cursor-pointer" v-if="!isClose"></i>
-                <i class="i-common:arrow-down w-14 h-14 cursor-pointer" v-else></i>
+                <i class="i-si:expand-less-alt-fill w-16 h-16 cursor-pointer" v-if="!isClose"></i>
+                <i class="i-si:expand-more-alt-fill w-16 h-16 cursor-pointer" v-else></i>
             </span>
         </div>
         <pre class="content-pre">{{ preCOntent }}</pre>
@@ -104,35 +104,39 @@ const themeThinkBg = computed(() => {
 </script>
 
 <style scoped lang="scss">
+@use "@/assets/base";
+
 .think-wrapper {
     margin-bottom: 5px;
     background-color: v-bind(themeThinkBg);
-    padding: 5px;
     box-sizing: border-box;
-    transition: max-height 0.5s ease;
+    transition:  0.5s ease;
     overflow: hidden;
 
     .has-thought {
-        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background-image: linear-gradient(22deg, rgb(11, 163, 96) 0%, #3cba92 100%);
+        padding: 10px;
+        color: #fff;
     }
-
     .think-content {
         line-height: 28px;
     }
 
     &.is-close {
-        height: 30px;
+        height: 42px;
     }
 }
 
 .is-close {
-    max-height: 30px;
+    max-height: 42px;
 }
 
 .content-pre {
+    font-family: "microsoft YAHEI";
+    padding-left: 26px;
     white-space: pre-wrap;
     overflow-wrap: break-word;
 }

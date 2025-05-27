@@ -139,7 +139,17 @@ function generateObject(arr: any) {
             files: arr[i].doc_files ? arr[i].doc_files : [],
             images: arr[i].images ? arr[i].images : []
         }
-        let value = arr[i + 1] ? (arr[i + 1].reasoning + arr[i + 1].content) : $t("模型异常，请重新生成");
+        let value
+        // 单模型和多模型的内容拼接
+        if (Array.isArray(arr[i + 1].content)) {
+            const contentArr = []
+            for (let j = 0; j < arr[i + 1].content.length; j++) {
+                contentArr.push(arr[i + 1].reasoning[j] + arr[i + 1].content[j])
+            }
+            value = contentArr
+        } else {
+            value = arr[i + 1] ? (arr[i + 1].reasoning + arr[i + 1].content) : $t("模型异常，请重新生成");
+        }
         result.set(key, {
             content: value,
             stat: arr[i + 1].stat,
@@ -147,6 +157,7 @@ function generateObject(arr: any) {
             tools_result: arr[i + 1].tools_result,
             id: arr[i + 1].id
         });
+
     }
     return result;
 }
@@ -305,21 +316,32 @@ export function openThirdPartyModel() {
  * @description 清空对话
  */
 export async function cleanAllChats() {
+    const { chatClearConfirm } = getSiderStoreData()
+    chatClearConfirm.value = true
+}
+
+/**
+ * @description 取消清空对话
+ */
+export function cancelCleanAllChats() {
+    const { chatClearConfirm } = getSiderStoreData()
+    chatClearConfirm.value = false
+}
+
+/**
+ * @description 确定清空对话
+ */
+export async function confirmCleanAllChats() {
     const { chatHistory } = getChatContentStoreData()
     const { chatList } = getSiderStoreData()
-    try {
-        await delConfirm({
-            title: "提示",
-            content: "是否删除所有对话?"
-        })
-        const all_context_id = chatList.value.map(item => item.context_id).join(",")
-        await post("/chat/remove_chat", { context_id: all_context_id })
-        message.success("删除成功")
-        get_chat_list()
-        chatHistory.value = new Map()
-    } catch (error) {
-        if (error) {
-            sendLog(error as Error)
-        }
-    }
+    await delConfirm({
+        title: "提示",
+        content: "是否删除所有对话?"
+    })
+    const all_context_id = chatList.value.map(item => item.context_id).join(",")
+    await post("/chat/remove_chat", { context_id: all_context_id })
+    message.success("删除成功")
+    get_chat_list()
+    chatHistory.value = new Map()
+    cancelCleanAllChats()
 }

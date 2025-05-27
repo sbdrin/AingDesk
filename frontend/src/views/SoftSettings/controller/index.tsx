@@ -18,22 +18,6 @@ const $t = i18n.global.t;
 export function openSoftSettings() {
 	const { softSettingsShow } = getSoftSettingsStoreData();
 	softSettingsShow.value = true;
-	/* const dialog = useDialog({
-		title: '软件设置',
-		content: () => <SoftSettings />,
-		selfClosable: true,
-		action: () => {
-			return <></>;
-		},
-		style: {
-			width: 'auto',
-		},
-		onClose: () => { 
-			resetMcp();
-			dialog.destroy();
-		}
-	});
-	return dialog; */
 }
 
 /**
@@ -70,32 +54,40 @@ export async function getDataSavePath() {
  * @description 更改数据存储位置
  */
 export async function changeDataSavePath() {
-	const { userDataPath } = getSoftSettingsStoreData();
-	dialog.warning({
-		title: $t('提示'),
-		content: $t('切换目录会将旧目录数据迁移到新目录,视数据大小可能需要5-10分钟，迁移过程中请勿关闭软件'),
-		positiveText: $t('选择新位置'),
-		negativeText: $t('取消'),
-		draggable: true,
-		closable: false,
-		onPositiveClick: async () => {
-			try {
-				const res = await post('/index/select_folder');
-				if (res.code == 200) {
-					userDataPath.value = res.message.folder;
-					const path_change_res = await post('/index/set_data_save_path', { newPath: userDataPath.value });
-					if (path_change_res.code == 200) {
-						changeProgressCheck();
-					} else {
-						message.error(path_change_res.msg!);
-						getDataSavePath();
-					}
-				}
-			} catch (error) {
-				sendLog(error as Error);
+	const { changeDataPathShow } = getSoftSettingsStoreData();
+	changeDataPathShow.value = true;
+}
+
+/**
+ * @description 取消更改数据存储位置
+ */
+export function cancelChangeDataSavePath() {
+	const { changeDataPathShow } = getSoftSettingsStoreData();
+	changeDataPathShow.value = false;
+	getDataSavePath();
+}
+
+/**
+ * @description 确认更改数据存储位置
+ */
+export async function confirmChangeDataSavePath() {
+	const { changeDataPathShow, userDataPath } = getSoftSettingsStoreData();
+	try {
+		const res = await post('/index/select_folder');
+		changeDataPathShow.value = false;
+		if (res.code == 200) {
+			userDataPath.value = res.message.folder;
+			const path_change_res = await post('/index/set_data_save_path', { newPath: userDataPath.value });
+			if (path_change_res.code == 200) {
+				changeProgressCheck();
+			} else {
+				message.error(path_change_res.msg!);
+				getDataSavePath();
 			}
-		},
-	});
+		}
+	} catch (error) {
+		sendLog(error as Error);
+	}
 }
 
 /**
@@ -442,39 +434,37 @@ export async function handleAddMcpServer() {
  * @param {string} name 服务器名称
  */
 export async function handleDeleteMcpServer(name: string) {
-	const { mcpServerFormShow, mcpServerEditMode } = getSoftSettingsStoreData();
-	const dialog = useDialog({
-		title: $t('提示'),
-		content: () => $t('是否删除当前MCP服务器？'),
-		style: {
-			width: '500px',
-		},
-		action: () => (
-			<div class="flex justify-center gap-2.5">
-				<NButton onClick={dialog.destroy}>{$t('取消')}</NButton>
-				<NButton
-					type="warning"
-					onClick={async () => {
-						const res = await post('/mcp/remove_mcp_server', { name });
-						if (res.code == 200) {
-							message.success($t('操作成功'));
-							mcpServerFormShow.value = false;
-							mcpServerEditMode.value = false;
-							// 刷新对话框工具选择
-							getMcpServerListForChat()
-						} else {
-							message.error(res.msg!);
-						}
-						await getMcpServerList();
-						dialog.destroy();
-					}}
-				>
-					{$t('确认')}
-				</NButton>
-			</div>
-		),
-	});
+	const { delMcpConfirmShow } = getSoftSettingsStoreData();
+	delMcpConfirmShow.value = true;
 }
+
+/**
+ * @description 取消卸载MCP服务器
+ */
+export function cancelDeleteMcpServer() {
+	const { delMcpConfirmShow } = getSoftSettingsStoreData();
+	delMcpConfirmShow.value = false;
+}
+
+/**
+ * @description 确认删除MCP服务器
+ */
+export async function confirmDeleteMcpServer() {
+	const { mcpServerFormShow, mcpServerEditMode, delMcpConfirmShow, currentMcpName } = getSoftSettingsStoreData();
+	const res = await post('/mcp/remove_mcp_server', { name: currentMcpName.value });
+	if (res.code == 200) {
+		message.success($t('操作成功'));
+		mcpServerFormShow.value = false;
+		mcpServerEditMode.value = false;
+		// 刷新对话框工具选择
+		getMcpServerListForChat()
+	} else {
+		message.error(res.msg!);
+	}
+	await getMcpServerList();
+	delMcpConfirmShow.value = false;
+}
+
 /**
  * * @description 打开MCP配置文件
  */

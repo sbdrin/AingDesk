@@ -33,7 +33,7 @@ const $t = i18n.global.t;
 const svgWrapper = ref<HTMLElement>()
 const props = defineProps<{ maidContent: string, id: string }>()
 const showSvg = ref(false)
-const { copy: copyFn } = useClipboard({ source: "" })
+const { copy: copyFn } = useClipboard({ source: "",legacy: true })
 
 /**
  * @description 渲染svg
